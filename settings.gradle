@@ -1,0 +1,4 @@
+rootProject.name = 'DongMunSeoDap_msa'
+include 'config-server'
+include 'eureka-server'
+include 'gateway-service'

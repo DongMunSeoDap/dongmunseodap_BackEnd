@@ -1,0 +1,76 @@
+plugins {
+    id 'java' // 자바 프로젝트
+    id 'org.springframework.boot' version '3.5.0' // 자동 설정과 실행 가능한 jar 생성 지원
+    id 'io.spring.dependency-management' version '1.1.7' // 의존성 관리를 위한 플러그인  (Spring Boot BOM)
+}
+
+allprojects {// 이 프로젝트의 모든 서브 프로젝트에 공통 적용됨
+    group = 'com.be'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+ext { // Spring Cloud 버전 관리용
+    set('springCloudVersion', "2023.0.3")
+}
+
+subprojects { // 서브 프로젝트에 대한 설정
+    plugins.withId('java'){
+
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(21)
+            }
+        }
+
+        configurations { // lombok 어노테이션 처리 가능
+            compileOnly {
+                extendsFrom annotationProcessor
+            }
+        }
+
+        dependencyManagement { // Spring Cloud 의존성 버전을 일괄 관리
+            imports {
+                mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            }
+        }
+
+        dependencies {
+
+            // Web
+            implementation 'org.springframework.boot:spring-boot-starter-web'
+
+            // lombok
+            compileOnly 'org.projectlombok:lombok'
+            annotationProcessor 'org.projectlombok:lombok'
+
+            // Test
+            testImplementation 'org.springframework.boot:spring-boot-starter-test'
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        }
+
+        bootJar {
+            enabled = false
+        }
+
+        jar {
+            enabled = true
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// 최상위 프로젝트에서는 bootjar와 jar 모두 비활성화 되어 있음, 실제로는 서브 프로젝트에서만 jar를 만듦
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = false
+}
