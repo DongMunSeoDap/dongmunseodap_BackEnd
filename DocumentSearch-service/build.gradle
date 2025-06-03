@@ -15,14 +15,32 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://packages.confluent.io/maven/' }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.springframework.boot:spring-boot-starter-logging'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+}
+dependencies {
+	implementation 'org.springframework.kafka:spring-kafka'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	// Jackson (Kafka 메시지 직렬화/역직렬화)
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 }
 
+/*dependencies {
+	implementation 'io.confluent:kafka-avro-serializer:7.5.0'
+	implementation 'org.apache.avro:avro:1.11.1'
+
+} -> 얘만 추가하면 오류뜸*/
 tasks.named('test') {
 	useJUnitPlatform()
 }
