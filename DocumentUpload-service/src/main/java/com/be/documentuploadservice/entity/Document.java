@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "document")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,8 @@ import lombok.Setter;
 @Setter
 public class Document { // -> es 연동 시 다시 설정
 
-  private String documentId;
+  @Id
+  private String documentId; // 문서 고유 ID
 
   // 파일 업로드 관련 정보
   private String fileName;

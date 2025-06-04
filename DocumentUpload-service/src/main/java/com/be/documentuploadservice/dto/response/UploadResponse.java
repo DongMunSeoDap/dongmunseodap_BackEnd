@@ -19,7 +19,9 @@ public class UploadResponse {
   private UploadStatus status; // 서버 내부처리 결과 (kafka에 존재 여부)
 
   // kafka message에 포합되지 않는 응답 전용 필드
-  private String message;
+  private String message; // FAILURE시 오류 메세지 출력
+
+  private String s3Path;
 
   public enum UploadStatus {
     SUCCESS, FAILURE
