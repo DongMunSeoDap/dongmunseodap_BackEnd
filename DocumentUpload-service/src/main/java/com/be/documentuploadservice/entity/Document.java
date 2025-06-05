@@ -1,5 +1,6 @@
 package com.be.documentuploadservice.entity;
 
+import org.springframework.data.elasticsearch.annotations.FieldType;
 import com.be.documentuploadservice.dto.response.UploadResponse.UploadStatus;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -8,13 +9,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Field;
 
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "document")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "documents")
 public class Document { // -> es 연동 시 다시 설정
 
   @Id
@@ -29,6 +31,8 @@ public class Document { // -> es 연동 시 다시 설정
   private String eventType;
   private String traceId;
   private String uploadedBy;
+
+  @Field(type = FieldType.Date)
   private Instant uploadedAt; // 절대 시점
 
   // 문서 메타 정보
