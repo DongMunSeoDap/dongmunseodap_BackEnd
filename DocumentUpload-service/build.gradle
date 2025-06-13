@@ -54,6 +54,7 @@ dependencies {
 
     // Test
     testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // PDF 텍스트 추출용 Apache PDFBox
     implementation 'org.apache.pdfbox:pdfbox:2.0.30'
