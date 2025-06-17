@@ -6,15 +6,11 @@ import com.be.documentuploadservice.dto.response.UploadResponse;
 import com.be.documentuploadservice.dto.response.UploadResponse.UploadStatus;
 import com.be.documentuploadservice.entity.Document;
 import com.be.documentuploadservice.mapper.DocumentMapper;
-import com.be.documentuploadservice.repository.DoucumentRepository;
+import com.be.documentuploadservice.repository.DocumentRepository;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.tika.language.detect.LanguageDetector;
-import org.apache.tika.language.detect.LanguageResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -26,7 +22,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Slf4j
 public class DocumentUploadService {
 
-  private final DoucumentRepository documentRepository;
+  private final DocumentRepository documentRepository;
   private final DocumentMapper documentMapper;
   private final S3Client s3Client;   // AWS SDK v2 S3 클라이언트 ,S3 API 호출용
 
@@ -82,20 +78,7 @@ public class DocumentUploadService {
 
     return documentMapper.toUploadResponse(doc);
   }
-
-  // 문서 언어 감지 로직
- /* public String languageDetector(MultipartFile file) {
-    try (PDDocument document = PDDocument.load(file.getInputStream())) {
-      PDFTextStripper stripper = new PDFTextStripper();
-      String text = stripper.getText(document);
-
-      LanguageDetector detector = new TikaLanguageDetector();
-      LanguageResult result = detector.detect(text);
-
-      return result.isReasonablyCertain() ? result.getLanguage() : "und";
-    } catch (Exception e) {
-      e.printStackTrace(); // 디버깅용
-      return "und";
-    }
-  }*/
+  /*
+    문서 언어 감지 로직
+   */
 }
