@@ -3,6 +3,7 @@ package com.be.documentuploadservice.resolver;
 import com.be.documentuploadservice.dto.request.DocumentMetaInput;
 import com.be.documentuploadservice.dto.request.EventContextInput;
 import com.be.documentuploadservice.dto.response.UploadResponse;
+import com.be.documentuploadservice.global.reponse.BaseResponse;
 import com.be.documentuploadservice.service.DocumentUploadService;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,15 @@ public class DocumentUploadResolver {
   private final DocumentUploadService documentUploadService;
 
   @MutationMapping
-  public UploadResponse uploadDocument(
+  public BaseResponse<UploadResponse> uploadDocument(
       @Argument MultipartFile file,
       @Argument DocumentMetaInput meta,
       @Argument EventContextInput context,
       DataFetchingEnvironment env) {
 
-    return documentUploadService.fileUpload(file, meta, context);
+    UploadResponse uploadResponse = documentUploadService.fileUpload(file, meta, context);
+
+    return BaseResponse.success("Upload Success", uploadResponse);
   }
 
 }
