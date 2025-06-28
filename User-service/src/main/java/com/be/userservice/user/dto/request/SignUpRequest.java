@@ -28,7 +28,7 @@ public class SignUpRequest {
   @Schema(description = "비밀번호", example = "1234")
   private String password;
 
-  @NotBlank(message = "사용자 이름은 필수입니다.")
-  @Schema(description = "사용자 이름", example = "주용")
-  private String name;
+  @Schema(description = "사용자 닉네임", example = "???")
+  private String nickName;
+
 }

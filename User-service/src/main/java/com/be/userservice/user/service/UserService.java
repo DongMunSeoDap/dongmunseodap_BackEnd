@@ -27,7 +27,7 @@ public class UserService {
     if(userRepository.existsByUsername(request.getUsername())) {
       throw new CustomException(UserErrorCode.USERNAME_ALREADY_EXISTS);
     }
-    if(userRepository.existsByname(request.getName())) {
+    if(userRepository.existsByNickName(request.getNickName())) {
       throw new CustomException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
     }
 
@@ -37,7 +37,7 @@ public class UserService {
     // 유저 엔티티 생성
     User user = User.builder()
         .username(request.getUsername())
-        .name(request.getName())
+        .nickName(request.getNickName())
         .password(encodePassword)
         .build();
 
@@ -50,7 +50,7 @@ public class UserService {
     // System.out.println("savedUser.getName() = " + savedUser.getName());
 
     log.info("New user registered: " + savedUser.getUsername()
-        + " New user Nickname: " + savedUser.getName());
+        + " New user Nickname: " + savedUser.getNickName());
 
     return userMapper.tosignUpResponse(savedUser);
   }

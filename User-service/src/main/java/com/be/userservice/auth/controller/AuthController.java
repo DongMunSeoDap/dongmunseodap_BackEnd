@@ -51,4 +51,26 @@ public class AuthController {
 
     return ResponseEntity.ok(BaseResponse.success("로그인에 성공했습니다.", loginResponse));
   }
+
+  @Operation(summary = "테스트용 로그인(관리자 역할로 자동 회원가입)", description = "개발 환경에서만 사용하세요")
+  @PostMapping("/test-login")
+  public ResponseEntity<BaseResponse<LoginResponse>> testLogin(
+      @RequestBody @Valid LoginRequest loginRequest, HttpServletResponse response) {
+
+    LoginResponse loginResponse = authService.testLogin(loginRequest);
+
+    String refreshToken = userRepository.findByUsername(loginRequest.getUsername())
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND))
+        .getRefreshToken();
+
+    Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+    refreshTokenCookie.setHttpOnly(true);
+    refreshTokenCookie.setPath("/");
+    refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7);
+
+    response.addCookie(refreshTokenCookie);
+
+    return ResponseEntity.ok(BaseResponse.success("테스트용 로그인에 성공했습니다.", loginResponse));
+  }
+
 }

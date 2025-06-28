@@ -20,7 +20,7 @@ public class LoginResponse {
   private String username;
 
   @Schema(description = "사용자 별명", example = "주용쓰")
-  private String name;
+  private String nickName;
 
   @Schema(description = "사용자 권한", example = "USER")
   private Role role;

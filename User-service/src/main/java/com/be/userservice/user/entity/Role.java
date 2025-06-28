@@ -9,6 +9,8 @@ public enum Role {
   NONMEMBER,
   @Schema(description = "관리자")
   ADMIN,
+  @Schema(description = "테스트유저")
+  TESTER,
   @Schema(description = "개발자")
   DEVELOPER;
 

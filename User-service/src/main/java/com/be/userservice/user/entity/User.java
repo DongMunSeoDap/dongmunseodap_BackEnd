@@ -36,11 +36,8 @@ public class User extends BaseTimeEntity {
   @Column(name="password", nullable = false)
   private String password;
 
-  @Column(name="name", nullable = false) // 사용자 이름
-  private String name;
-
-  @Column(name="introduce")
-  private String introduce;
+  @Column(name = "nickname", nullable = false)
+  private String nickName;
 
   @Column(name="role", nullable = false)
   @Enumerated(EnumType.STRING)

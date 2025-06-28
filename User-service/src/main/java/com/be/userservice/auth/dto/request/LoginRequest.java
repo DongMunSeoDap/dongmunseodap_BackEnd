@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class LoginRequest {
 
   @NotBlank(message = "사용자 아이디 항목은 필수입니다.")
-  @Schema(description = "사용자 아이디", example = "parkjuyong")
+  @Schema(description = "사용자 아이디", example = "admin")
   private String username;
 
   @NotBlank(message = "비밀번호 항목은 필수입니다.")
