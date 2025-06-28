@@ -1,7 +1,12 @@
 package com.be.documentsearchservice.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@Setter(onMethod_ = @Autowired)
+@Getter
 @Data
 public class DocumentUploadedEvent {
     private String version;
