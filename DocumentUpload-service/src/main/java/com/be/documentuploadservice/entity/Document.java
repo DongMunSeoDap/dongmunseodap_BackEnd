@@ -1,5 +1,6 @@
 package com.be.documentuploadservice.entity;
 
+import java.time.LocalDateTime;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -25,14 +26,15 @@ public class Document { // -> es 연동 시 다시 설정
   private String documentName;
   private String s3Path; // S3 저장 경로
 
-  // 이벤트 컨텍스트 정보
+/*  // 이벤트 컨텍스트 정보
   private String version;
   private String eventType;
-  private String traceId;
+  private String traceId;*/
+
   private String uploadedBy;
 
   @Field(type = FieldType.Date)
-  private Instant uploadedAt; // 절대 시점
+  private LocalDateTime uploadedAt; // 절대 시점
 
   // 문서 메타 정보
   private String mimeType;
