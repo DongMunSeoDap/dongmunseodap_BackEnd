@@ -13,12 +13,21 @@ java {
 		languageVersion.set(JavaLanguageVersion.of(21))
 	}
 }
-
+ext {
+	set('springAiVersion', "1.0.0")
+}
 
 repositories {
 	mavenCentral()
-	maven { url 'https://packages.confluent.io/maven/' }
+	maven { url 'https://packages.confluent.io/maven/'}
+	maven { url 'https://repo.spring.io/release'} // Spring AI 릴리즈 저장소
 }
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+	}
+}
+
 
 dependencies {
 	// Spring Boot 기본 설정
@@ -40,22 +49,39 @@ dependencies {
 	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
 
+	// elasticSearch
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+	// openai 및 pinecone(벡터DB)
+	implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
+
+	// OpenAI Java SDK
+	implementation 'com.theokanning.openai-gpt3-java:client:0.12.0'
+	// (버전은 최신 릴리즈 확인 후 조정)
+
+	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
+}
 avro {
 	createSetters = false
 }
 sourceSets {
 	main {
 		java {
-			srcDirs 'src/main/java', 'build/generated-main-avro-java'
+			srcDirs 'src/main/java', 'src/main/avro'
 		}
 	}
 }
 
 springBoot {
-	mainClass = 'com.be.documentsearchservice.DocumentSearchServiceApplication'
+	mainClass.set('com.be.documentsearchservice.DocumentSearchServiceApplication')
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
