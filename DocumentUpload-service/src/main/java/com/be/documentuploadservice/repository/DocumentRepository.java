@@ -5,9 +5,9 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.stereotype.Repository;
 
-@Repository
+/*@Repository
 public interface DocumentRepository extends ElasticsearchRepository<Document, String> {
 
 
-}
+}*/
 

@@ -1,84 +1,95 @@
 package com.be.documentuploadservice.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.be.documentuploadservice.dto.request.DocumentMetaInput;
 import com.be.documentuploadservice.dto.request.EventContextInput;
 import com.be.documentuploadservice.dto.response.UploadResponse;
-import com.be.documentuploadservice.dto.response.UploadResponse.UploadStatus;
 import com.be.documentuploadservice.entity.Document;
+import com.be.documentuploadservice.entity.PathName;
+import com.be.documentuploadservice.entity.UplaodStatus;
+import com.be.documentuploadservice.exception.S3ErrorCode;
+import com.be.documentuploadservice.global.config.S3Config;
+import com.be.documentuploadservice.global.exception.CustomException;
 import com.be.documentuploadservice.mapper.DocumentMapper;
-import com.be.documentuploadservice.repository.DocumentRepository;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DocumentUploadService {
 
-  private final DocumentRepository documentRepository;
+  // private final DocumentRepository documentRepository;
   private final DocumentMapper documentMapper;
-  private final S3Client s3Client;   // AWS SDK v2 S3 클라이언트 ,S3 API 호출용
 
-  private final String bucketName = "dongmunseodap-test-bucket";
+  private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
+  private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
 
+  // 문서 업로드
+  public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
+  {
 
-  // 파일 업로드 시 처리 로직
-  public UploadResponse fileUpload(MultipartFile file,
-      DocumentMetaInput meta, EventContextInput context) {
+    String pdfUrl = uploadFile(pathName, file); // 문서 객체 Url
 
-    // S3 업로드 로직
-    String documentId = UUID.randomUUID().toString();
-    String key = "documents/" + documentId + "/" + file.getOriginalFilename(); // 객체 키
-    String s3Path; // S3 경로 저장용
+    return UploadResponse.builder().pdfUrl(pdfUrl).build();
 
-    boolean uploadSuccess = false; // 업로드 초기 상태
-
-    try {
-      PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-          .bucket(bucketName)
-          .key(key)
-          .contentType(file.getContentType())
-          .build();
-
-      s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-
-      uploadSuccess = true;
-      s3Path = "s3://" + bucketName + "/" + key;
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      uploadSuccess = false;
-      s3Path = null;
-    }
-
-    Document doc = Document.builder()
-        .documentId(documentId)
-        .fileName(file.getOriginalFilename())
-        .mimeType(file.getContentType())
-        .language(meta.getLanguage())
-        .uploadedBy(context.getUploadedBy())
-        .uploadedAt(Instant.now())
-        .status(uploadSuccess ? UploadStatus.SUCCESS : UploadStatus.FAILURE)
-        .message(uploadSuccess ? null : "Upload failure")
-        .s3Path(s3Path)
-        .build();
-
-    if(uploadSuccess) {
-      documentRepository.save(doc);
-    }
-
-    log.info("Uploaded to S3: {}", s3Path);
-
-    return documentMapper.toUploadResponse(doc);
   }
-  /*
-    문서 언어 감지 로직
-   */
+
+  // 파일 업로드
+  public String uploadFile(PathName pathName, MultipartFile file) {
+
+    validateFile(file); // 파일 유료성 검사
+
+    String originalFilename = file.getOriginalFilename(); // 기존 파일 이름
+    if(originalFilename == null || originalFilename.isBlank()) {
+      throw new CustomException(S3ErrorCode.FILE_NOT_FOUND);
+    }
+
+    String s3Path = createS3Path(pathName, originalFilename); // S3 파일 경로 생성 (경로+이름)
+
+    // 메타 데이터 설정
+    ObjectMetadata metadata = new ObjectMetadata();
+    metadata.setContentLength(file.getSize()); // 파일 크기
+    metadata.setContentType(file.getContentType()); // 파일 타입 (application/pdf)
+
+    // S3에 파일 업로드
+    try {
+      amazonS3.putObject(
+          new PutObjectRequest(s3Config.getBucket(), s3Path, file.getInputStream(), metadata));
+      return amazonS3.getUrl(s3Config.getBucket(), s3Path).toString();
+    } catch (Exception e) {
+      log.error("S3 upload 중 오류 발생", e);
+      throw new CustomException(S3ErrorCode.FILE_SERVER_ERROR);
+    }
+
+  }
+
+  // 업로드 파일 유효성 검사
+  public void validateFile(MultipartFile file) {
+    if (file.getSize() > 5 * 1024 * 1024) { // 파일 크기 5MB 이하 업로드 가능
+      throw new CustomException(S3ErrorCode.FILE_SIZE_INVALID);
+    }
+
+    String contentType =file.getContentType();
+
+    if(contentType == null || !contentType.equals("application/pdf")) { // pdf 형식만 허용
+      throw new CustomException(S3ErrorCode.FILE_TYPE_INVALID);
+    }
+  }
+
+  // 파일 경로 생성
+  public String createS3Path(PathName pathName, String originalFilename) {
+    return switch (pathName) {
+      case USERDOCUMENTS ->s3Config.getUserDocumentsPath();
+    }
+        + "/"
+        + originalFilename;
+
+  }
 }
