@@ -36,7 +36,7 @@ public class SwaggerConfig {
                         .bearerFormat("JWT")))*/
         .info(new Info().title("Swagger API 명세서")
             .version("1.0")
-            .description("My Swagger"));
+            .description("사용설명서 챗봇 빌더"));
   }
 
   @Bean
@@ -44,15 +44,6 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
         .group("api")
         .pathsToMatch("/**")
-        .build();
-  }
-
-  // 와일드카드(** : 모든 것들을 불러오겠다, * : 하위 폴더 하나만 불러오겠다.)
-  @Bean
-  public GroupedOpenApi customGroupedOpenApi2() {
-    return GroupedOpenApi.builder()
-        .group("api-update")
-        .pathsToMatch("/api/update/**")
         .build();
   }
 }
