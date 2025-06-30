@@ -2,11 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
-    id "com.netflix.dgs.codegen" version "8.0.4"
-}
-
-ext {
-    springAiVersion = "1.0.0"
 }
 
 group = 'com.be'
@@ -20,12 +15,9 @@ java {
 
 repositories {
     mavenCentral()
-    maven { url "https://plugins.gradle.org/m2/" }
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -33,15 +25,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Dgs (GraphQL)
-    implementation 'com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter:7.3.3'
+    // Swagger openapi-ui
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
+
+    // Spring Security
+
+    // graphql
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
-    implementation(platform('com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:5.5.1'))
-    implementation 'com.netflix.graphql.dgs:graphql-dgs-extended-scalars' // graphql 이랑 java 타입을 맞추기 위함
-
-
-    // kafka
-    implementation 'org.springframework.kafka:spring-kafka'
 
     // JSON 처리 (kafka 메세지 직렬화용)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -49,47 +39,18 @@ dependencies {
     // 파일 처리
     implementation 'commons-io:commons-io:2.15.1'
 
-    // validation (DTO 검증)
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
     // Test
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // PDF 텍스트 추출용 Apache PDFBox
-    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
-    implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
-    implementation 'org.springframework.ai:spring-ai-tika-document-reader'
-
-    // 언어 감지용 Apache Tika
-    implementation 'org.apache.tika:tika-langdetect:2.9.1'
-
-    // Tika core (언어 감지에 필요한 core 엔진)
-    implementation 'org.apache.tika:tika-core:2.9.1'
-
-    // AWS SDK v2 - S3
-    implementation 'software.amazon.awssdk:s3:2.20.34'
+    // AWS S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     // es
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-
 }
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.ai:spring-ai-bom:$springAiVersion"
-    }
-}
-
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-bootJar {
-    enabled = true
-}
-
-jar {
-    enabled = false
 }
