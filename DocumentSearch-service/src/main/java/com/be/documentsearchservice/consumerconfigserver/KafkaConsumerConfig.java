@@ -1,7 +1,6 @@
 package com.be.documentsearchservice.consumerconfigserver;
 
-
-import com.be.documentsearchservice.kafka.avro.DocumentUploadedEvent;
+import com.be.documentsearchservice.dto.DocumentUploadedEvent;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;

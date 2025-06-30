@@ -1,7 +1,7 @@
 package com.be.documentsearchservice.consumer;
 
-import com.be.documentsearchservice.kafka.avro.DocumentUploadedEvent;
-import com.be.documentsearchservice.kafka.avro.Payload;
+import com.be.documentsearchservice.dto.DocumentUploadedEvent;
+import com.be.documentsearchservice.dto.DocumentUploadedEvent.Payload;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,23 +34,23 @@ public class DocumentUploadedConsumer {
 
         // 이벤트 메타 정보 출력 : 버전, 타입, 트레이스 ID 등 기본 정보 출력
         logger.info("Version: {}", event.getVersion());
-        logger.info("Event Type: {}", event.getEventType());
-        logger.info("Trace ID: {}", event.getTraceId());
+        logger.info("Event Type: {}", event.getEvent_type());
+        logger.info("Trace ID: {}", event.getTrace_id());
 
         Payload payload = event.getPayload(); // payload 객체 추출, 문서 파일의 주요 정보가 담긴 구조
         if (payload != null) { // payload 객체 추출 null-safe
-            logger.info("Document ID: {}", payload.getDocumentId());
-            logger.info("File Name: {}", payload.getFileName());
-            logger.info("S3 Path: {}", payload.getS3Path());
-            logger.info("Uploaded By: {}", payload.getUploadedBy());
-            logger.info("Uploaded At: {}", payload.getUploadedAt());
+            logger.info("Document ID: {}", payload.getDocument_id());
+            logger.info("File Name: {}", payload.getFile_name());
+            logger.info("S3 Path: {}", payload.getS3_path());
+            logger.info("Uploaded By: {}", payload.getUploaded_at());
+            logger.info("Uploaded At: {}", payload.getUploaded_by());
         } else {
             logger.warn("Payload is null");
         }
 
         // meta 필드 관련 null-safe및 MIME 타입 ( 파일 형식) 과 언어 정보 출력
         if (event.getMeta() != null) {
-            logger.info("Mime Type: {}", event.getMeta().getMimeType());
+            logger.info("Mime Type: {}", event.getMeta().getMime_type());
             logger.info("Language: {}", event.getMeta().getLanguage());
         } else {
             logger.warn("Meta is null");
