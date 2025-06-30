@@ -14,12 +14,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auths")
@@ -56,6 +58,8 @@ public class AuthController {
   @PostMapping("/test-login")
   public ResponseEntity<BaseResponse<LoginResponse>> testLogin(
       @RequestBody @Valid LoginRequest loginRequest, HttpServletResponse response) {
+
+    log.info("testLogin API 호출 - username: {}", loginRequest.getUsername());
 
     LoginResponse loginResponse = authService.testLogin(loginRequest);
 
