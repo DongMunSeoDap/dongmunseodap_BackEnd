@@ -14,6 +14,7 @@ import com.be.documentuploadservice.global.config.S3Config;
 import com.be.documentuploadservice.global.exception.CustomException;
 import com.be.documentuploadservice.mapper.DocumentMapper;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class DocumentUploadService {
 
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
+  // private final Document document;
 
   // 문서 업로드
   public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
@@ -37,7 +39,15 @@ public class DocumentUploadService {
 
     String pdfUrl = uploadFile(pathName, file); // 문서 객체 Url
 
-    return UploadResponse.builder().pdfUrl(pdfUrl).build();
+    return UploadResponse.builder()
+        .documentName(file.getOriginalFilename())
+        .s3Path(createS3Path(pathName, file.getOriginalFilename())) // s3 저장 경로
+        .status(UplaodStatus.SUCCESS)
+        .uploadedBy("admin") // 추후에 사용자 id로 확장
+        .uploadedAt(LocalDateTime.now())
+        .message("문서 업로드에 성공했습니다.")
+        .pdfUrl(pdfUrl) // 객체 url
+        .build();
 
   }
 
@@ -62,6 +72,7 @@ public class DocumentUploadService {
     try {
       amazonS3.putObject(
           new PutObjectRequest(s3Config.getBucket(), s3Path, file.getInputStream(), metadata));
+
       return amazonS3.getUrl(s3Config.getBucket(), s3Path).toString();
     } catch (Exception e) {
       log.error("S3 upload 중 오류 발생", e);
@@ -86,7 +97,7 @@ public class DocumentUploadService {
   // 파일 경로 생성
   public String createS3Path(PathName pathName, String originalFilename) {
     return switch (pathName) {
-      case USERDOCUMENTS ->s3Config.getUserDocumentsPath();
+      case DOCUMENTS ->s3Config.getUserDocumentsPath();
     }
         + "/"
         + originalFilename;
