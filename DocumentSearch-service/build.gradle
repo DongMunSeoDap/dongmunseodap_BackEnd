@@ -54,13 +54,21 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
 	// openai 및 pinecone(벡터DB)
-	implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+	//implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+	implementation 'org.springframework.ai:spring-ai-starter-openai:1.0.0'
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 
-	// OpenAI Java SDK
+	// — Spring AI Core: OpenAI HTTP 클라이언트 + Auto-Config
+	implementation "org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0"
+
+	// — EmbeddingModel 구현체
+	implementation "org.springframework.ai:spring-ai-starter-model-openai:1.0.0"
+
+	// — Pinecone VectorStore 구현체
+	implementation "org.springframework.ai:spring-ai-starter-vector-store-pinecone:1.0.0"
+	// OpenAI Java SDK (임베딩)
 	implementation 'com.theokanning.openai-gpt3-java:client:0.12.0'
-	// (버전은 최신 릴리즈 확인 후 조정)
 
 	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
