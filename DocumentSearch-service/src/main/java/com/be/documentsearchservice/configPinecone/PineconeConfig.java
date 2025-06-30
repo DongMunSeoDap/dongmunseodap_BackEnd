@@ -1,4 +1,4 @@
-package com.be.documentsearchservice.config;
+package com.be.documentsearchservice.configPinecone;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

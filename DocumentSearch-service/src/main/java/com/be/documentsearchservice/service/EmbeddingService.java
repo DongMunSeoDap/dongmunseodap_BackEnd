@@ -2,6 +2,8 @@ package com.be.documentsearchservice.service;
 
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 public class EmbeddingService {
 
     private final EmbeddingModel embeddingModel;
-
+    @Autowired
     public EmbeddingService(EmbeddingModel embeddingModel) {
         this.embeddingModel = embeddingModel;
     }
