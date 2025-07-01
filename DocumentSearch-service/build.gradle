@@ -13,19 +13,11 @@ java {
 		languageVersion.set(JavaLanguageVersion.of(21))
 	}
 }
-ext {
-	set('springAiVersion', "1.0.0")
-}
-
 repositories {
 	mavenCentral()
 	// Kafka Avro serializer
-	maven { url 'https://packages.confluent.io/maven/' }
-}
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-	}
+	maven {
+		url = 'https://packages.confluent.io/maven/' }
 }
 
 
@@ -37,7 +29,6 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -54,8 +45,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
 	// openai 및 pinecone(벡터DB)
-	implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
-	implementation 'org.springframework.ai:spring-ai-starter-openai'
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 
@@ -77,7 +66,7 @@ avro {
 sourceSets {
 	main {
 		java {
-			srcDirs 'src/main/java'
+			srcDirs = ['src/main/java']
 		}
 	}
 }

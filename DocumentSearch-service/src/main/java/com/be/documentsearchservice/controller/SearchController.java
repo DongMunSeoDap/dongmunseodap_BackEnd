@@ -16,7 +16,7 @@ import java.util.Map;
  * 검색 엔드포인트: 쿼리 → 임베딩 → Pinecone 검색 → 결과 반환
  */
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping("/api/v1")
 public class SearchController {
 
     private final EmbeddingService embeddingService;
@@ -30,7 +30,7 @@ public class SearchController {
         this.vectorSearchService = vectorSearchService;
     }
 
-    @PostMapping
+    @PostMapping("/search")
     public ResponseEntity<List<SimilarDto>> search(@RequestBody Map<String,String> body) {
         String query = body.get("query");
         List<Double> vector = embeddingService.embed(query);
