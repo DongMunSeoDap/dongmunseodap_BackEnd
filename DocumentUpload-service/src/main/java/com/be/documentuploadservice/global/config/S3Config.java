@@ -30,7 +30,7 @@ public class S3Config {
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
-  @Value("${cloud.aws.s3.path.user-documents}")
+  @Value("${cloud.aws.s3.path.documents}")
   private String userDocumentsPath;
 
   @PostConstruct // 의존성 주입이 완료된 후 실행(access/seceret key 의존성 주입 후 사용 목적)
