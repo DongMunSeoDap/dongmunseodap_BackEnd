@@ -13,9 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Controller
 @RequiredArgsConstructor
 public class DocumentUploadResolver {
 
@@ -23,8 +24,8 @@ public class DocumentUploadResolver {
 
   // S3에 업로드 된 파일 전체 조회
   @QueryMapping
-  public List<String> getAllFiles(@Argument PathName pathName) {
-    return documentUploadService.getAllFiles(pathName);
+  public List<String> getS3Files(@Argument PathName pathName) {
+    return documentUploadService.getAllS3Files(pathName);
   }
 
 }

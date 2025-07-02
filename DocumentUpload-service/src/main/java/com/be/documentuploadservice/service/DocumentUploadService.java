@@ -71,6 +71,8 @@ public class DocumentUploadService {
       amazonS3.putObject(
           new PutObjectRequest(s3Config.getBucket(), KeyName, file.getInputStream(), metadata));
 
+      log.info("업로드 성공");
+
       return amazonS3.getUrl(s3Config.getBucket(), KeyName).toString();
     } catch (Exception e) {
       log.error("S3 upload 중 오류 발생", e);
@@ -80,10 +82,12 @@ public class DocumentUploadService {
   }
 
   // S3에 업로드된 파일 전체 조회 (S3 Url 반환)
-  public List<String> getAllFiles(PathName pathName) {
+  public List<String> getAllS3Files(PathName pathName) {
     String prefix = switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
     };
+
+    log.info(">>>> S3 prefix: {}", prefix);
 
     try {
       return amazonS3
