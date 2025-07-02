@@ -1,4 +1,8 @@
 rootProject.name = 'DongMunSeoDap_msa'
+
 include 'config-server'
 include 'eureka-server'
 include 'gateway-service'
+include 'DocumentUpload-service'
+include 'DocumentSearch-service'
+include 'User-service'

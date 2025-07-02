@@ -1,0 +1,32 @@
+#scalar Upload ## 사용자로부터 파일을 업로드 받을 때 사용하는 파일 스칼라 타입 정의
+
+"""문서 조회"""
+type Query { # 데이터를 읽어오는 요청
+    getS3Files(pathName: PathName!): [String!]
+}
+
+type Document { # Document 타입 정의
+    documentId: ID! # 고유 식별자
+
+    # 파일 업로드 관련 정보
+    documentName: String!
+    s3Path: String!
+    uploadedBy: String! # 사용자 이름
+    uploadedAt: String! # GraphQL Instant 타입 지원x
+
+    # 업로드 상태
+    status: UploadStatus!
+    message: String
+}
+
+"""업로드 성공 여부"""
+enum UploadStatus {
+    SUCCESS
+    FAILURE
+}
+
+"""S3 파일 경로"""
+enum PathName {
+    DOCUMENTS
+}
+
