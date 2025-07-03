@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: DocumentSearch-service
+
+  server:
+    port: 8081
+    servlet:
+      context-path: /
+      encoding:
+        enabled: true
+        force: true
+        charset: UTF-8
+    error:
+      include-message: always
+      include-exception: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      auto-startup: false
+    consumer:
+      group-id: document-uploaded-topic
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+    properties:
+      schema.registry.url: http://localhost:8081
+
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      embedding:
+        options:
+          model: text-embedding-ada-002
+    vectorstore:
+      pinecone:
+        api-key: ${PINECONE_API_KEY}
+        environment: ${PINECONE_ENVIRONMENT}
+        index-name: ${PINECONE_INDEX}
+
+# PineconeConfig uses these root-level properties
+pinecone:
+  api-key: ${PINECONE_API_KEY}
+  environment: ${PINECONE_ENVIRONMENT}
+  index: ${PINECONE_INDEX}
+
+# EmbeddingModel uses OpenAI key from root level if needed
+openai:
+  api-key: ${OPENAI_API_KEY}
+
+# Kafka topic name
+kafka:
+  topic:
+    name: document-uploaded-topic
+
+logging:
+  level:
+    org.springframework.ai: DEBUG
+
+
+
