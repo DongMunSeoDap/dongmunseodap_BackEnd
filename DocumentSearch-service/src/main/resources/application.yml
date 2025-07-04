@@ -2,6 +2,21 @@ spring:
   application:
     name: DocumentSearch-service
 
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}            # OpenAI API 키 (환경 변수로부터)
+      embedding:
+        api-key: ${OPENAI_API_KEY}
+        options:
+          model: text-embedding-ada-002
+
+    vectorstore:
+      pinecone:
+        api-key: ${PINECONE_API_KEY}           # Pinecone API 키
+        index-name: ${PINECONE_INDEX}          # Pinecone 인덱스 이름
+        environment: ${PINECONE_ENVIRONMENT}
+        endpoint: https://dongmunseodap-document-index-dev-1a3x1qg.svc.aped-4627-b74a.pinecone.io
+
   server:
     port: 8081
     servlet:
@@ -14,50 +29,10 @@ spring:
       include-message: always
       include-exception: true
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    listener:
-      auto-startup: false
-    consumer:
-      group-id: document-uploaded-topic
-      auto-offset-reset: earliest
-      enable-auto-commit: false
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-    properties:
-      schema.registry.url: http://localhost:8081
-
-
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      embedding:
-        options:
-          model: text-embedding-ada-002
-    vectorstore:
-      pinecone:
-        api-key: ${PINECONE_API_KEY}
-        environment: ${PINECONE_ENVIRONMENT}
-        index-name: ${PINECONE_INDEX}
-
-# PineconeConfig uses these root-level properties
-pinecone:
-  api-key: ${PINECONE_API_KEY}
-  environment: ${PINECONE_ENVIRONMENT}
-  index: ${PINECONE_INDEX}
-
-# EmbeddingModel uses OpenAI key from root level if needed
-openai:
-  api-key: ${OPENAI_API_KEY}
-
-# Kafka topic name
-kafka:
-  topic:
-    name: document-uploaded-topic
-
 logging:
   level:
     org.springframework.ai: DEBUG
+
 
 
 
