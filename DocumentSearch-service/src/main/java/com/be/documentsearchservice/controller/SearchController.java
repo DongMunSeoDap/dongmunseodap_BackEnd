@@ -1,36 +1,29 @@
 package com.be.documentsearchservice.controller;
 
-import com.be.documentsearchservice.dto.SimilarDto;
 import com.be.documentsearchservice.service.EmbeddingService;
-import com.be.documentsearchservice.service.PineconeHttpService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/ai")
 public class SearchController {
 
     private final EmbeddingService embeddingService;
-    private final PineconeHttpService pinecone;
 
-    public SearchController(EmbeddingService embeddingService,
-                            PineconeHttpService pinecone) {
+    public SearchController(EmbeddingService embeddingService) {
         this.embeddingService = embeddingService;
-        this.pinecone        = pinecone;
     }
 
-    @PostMapping("/ai/search")
-    public ResponseEntity<List<SimilarDto>> search(
-            @RequestBody Map<String,String> req
-    ) {
-        String query = req.get("query");
-        float[] vec = embeddingService.embed(query);
-        List<SimilarDto> results = pinecone.query(vec, 5);
-        return ResponseEntity.ok(results);
+    @PostMapping("/search")
+    public ResponseEntity<float[]> search(@RequestBody Map<String, String> body) {
+        String query = body.get("query");
+        float[] embedding = embeddingService.embed(query);
+        return ResponseEntity.ok(embedding);
     }
 }
-

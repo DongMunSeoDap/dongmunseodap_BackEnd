@@ -46,14 +46,10 @@ dependencies {
 
 	// openai 및 pinecone(벡터DB)
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
-	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 
 
 	// — EmbeddingModel 구현체
 	implementation "org.springframework.ai:spring-ai-starter-model-openai:1.0.0"
-
-	// — Pinecone VectorStore 구현체
-	implementation "org.springframework.ai:spring-ai-starter-vector-store-pinecone:1.0.0"
 
 	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
