@@ -54,8 +54,27 @@ dependencies {
 	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	// pincone client
+	//implementation "io.pinecone:pinecone-client:5.1.0"
+
+	// Pinecone 클라이언트
+	implementation("io.pinecone:pinecone-client:2.1.0") {
+		// 다른 트랜지티브 protobuf-java 의존성은 제외
+		exclude group: "com.google.protobuf", module: "protobuf-java"
+	}
+
+	// Pinecone이 기대하는 Protobuf 버전 (여기서는 3.24.4)
+	implementation "com.google.protobuf:protobuf-java:3.24.4"
+
+
+
 
 }
+
+configurations.all {
+	resolutionStrategy.force "com.google.protobuf:protobuf-java:3.24.4"
+}
+
 avro {
 	createSetters = false
 }

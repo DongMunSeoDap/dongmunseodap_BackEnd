@@ -9,6 +9,7 @@ public class DocumentSearchServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DocumentSearchServiceApplication.class, args);
+
 	}
 
 }
