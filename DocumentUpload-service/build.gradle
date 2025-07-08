@@ -34,11 +34,11 @@ dependencies {
     // Swagger openapi-ui
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
 
-    // Spring Config Server
-    implementation 'org.springframework.cloud:spring-cloud-config-server'
+    // spring cloud config
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
-    // Spring Security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // eureka-clinet
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     // graphql
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
