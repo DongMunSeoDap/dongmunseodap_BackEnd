@@ -29,5 +29,10 @@
       "name": "spring.ai.vectorstore.pinecone.environment",
       "type": "java.lang.String",
       "description": "Description for spring.ai.vectorstore.pinecone.environment."
+    },
+    {
+      "name": "spring.ai.vectorstore.pinecone.host",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.vectorstore.pinecone.host."
     }
   ] }
