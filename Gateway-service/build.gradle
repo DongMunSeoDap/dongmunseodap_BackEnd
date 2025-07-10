@@ -25,6 +25,7 @@ dependencyManagement {
 
 dependencies {
 
+
     // Gateway
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
