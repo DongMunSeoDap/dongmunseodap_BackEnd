@@ -24,13 +24,17 @@ dependencyManagement {
 }
 
 dependencies {
-    // web mvc
-    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // gateway
+    // Gateway
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
+    // OAuth2 Client (TokenRelay 사용 시 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-    // test
+    // Resilience4j (필요시)
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0' // ✅ (선택)
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
