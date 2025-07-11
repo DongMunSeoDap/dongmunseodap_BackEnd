@@ -39,22 +39,26 @@ public class EmbeddingController {
     */
 
 
-
-    // open api 임베딩해서 받아온 값 -> pinecone search 결과 확인용
     @PostMapping("/query")
-    public ResponseEntity<QueryResponseWithUnsignedIndices> search(
-            //@RequestParam("message") String message
-            @RequestBody UserQuery uq
-    ) {
+    public ResponseEntity<?> search(@RequestBody UserQuery uq) {
         String userId = uq.userId();
         String query = uq.query();
+
+        //  입력 유효성 검증
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Query must not be null or empty");
+        }
+
         float[] vec = embeddingService.embed(query);
         log.info("embedding vector length = {}", vec.length);
+
         EmbeddingResponse embedding = new EmbeddingResponse(query, vec);
         QueryResponseWithUnsignedIndices resp = embeddingService.search(embedding);
         log.info("Pinecone resp = {}", resp);
-        return ok(resp);
+
+        return ResponseEntity.ok(resp);
     }
+
 
 
 
