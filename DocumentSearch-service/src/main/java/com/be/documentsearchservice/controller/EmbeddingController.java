@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.ResponseEntity.ok;
+import java.util.Arrays;
+
 
 @RestController
 @RequestMapping("/api")
@@ -49,6 +50,7 @@ public class EmbeddingController {
         String userId = uq.userId();
         String query = uq.query();
         float[] vec = embeddingService.embed(query);
+        log.info("embedding vector (first 10 values) = {}", Arrays.toString(Arrays.copyOf(vec, 10)));
         log.info("embedding vector length = {}", vec.length);
         EmbeddingResponse embedding = new EmbeddingResponse(query, vec);
         QueryResponseWithUnsignedIndices resp = embeddingService.search(embedding);
