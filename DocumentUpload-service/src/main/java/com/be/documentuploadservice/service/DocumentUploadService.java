@@ -24,9 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class DocumentUploadService {
 
-  // private final DocumentRepository documentRepository;
-  // private final DocumentMapper documentMapper;
-
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
 
@@ -48,7 +45,7 @@ public class DocumentUploadService {
 
   }
 
-  // 파일 업로드
+  // 파일 업로드 -> 업로드된 PDF문서의 URL을 반환
   public String uploadFile(PathName pathName, MultipartFile file) {
 
     validateFile(file); // 파일 유료성 검사
@@ -117,7 +114,7 @@ public class DocumentUploadService {
     }
   }
 
-  // S3 파일 경로 생성 (여기서 keyName은 원본파일 이름)
+  // S3 파일 경로(URL) 생성 (여기서 keyName은 경로 + 파일명)
   public String createKeyName(PathName pathName, String originalFilename) {
     return switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
