@@ -1,12 +1,16 @@
 server:
   port: 8000
 
+# Eureka Client 등록 설정
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
     service-url:
-      defaultzone: http://localhost:8761/eureka
+      defaultZone: http://parkjuyong:1234@localhost:8761/eureka/
+    fetch-registry: false
+  instance:
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
 
 spring:
   application:
@@ -27,7 +31,7 @@ spring:
               args:
                 name: API-fallback
                 fallbackUri: forward:/fallback/query
-            - name: Retry # 502 발생 시, 지정한 횟수만큼 재시도
+            - name: Retry # 502, 504 발생 시 지정한 횟수만큼 재시도
               args:
                 retries: 2
                 statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
@@ -35,9 +39,10 @@ spring:
             - name : SecureHeaders # client축 보안
 
         - id: DocumentUpload
-          uri: http://localhost:8081
+          uri: http://localhost:8080
           predicates:
-            - Path=/api/query/**
+            - Path=/api/upload-documents/**
+            - Path=/api/graphql/**
           filters:
             # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
             - RemoveRequestHeader=Cookie
@@ -68,4 +73,4 @@ spring:
                 name: login-fallback
                 fallbackUri: forward:/fallback/login
   main:
-    web-application-type: reactive
+    web-application-type: reactive #webFulx 기반 동작
