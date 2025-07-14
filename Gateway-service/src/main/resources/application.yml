@@ -1,15 +1,71 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultzone: http://localhost:8761/eureka
+
 spring:
+  application:
+    name: Gateway-service
+
   cloud:
     gateway:
       routes:
-        - id: dongmunseodap
-          uri: https://dongmunseodap-service
+        - id: DocumentSearch
+          uri: http://localhost:8083
           predicates:
-            - Path=/api/upload-documents,/api/graphql,/api/auth/test-login,/api/query
+            - Path=/api/upload-documents/**
+            - Path=/api/graphql/**
           filters:
-            - AddRequestHeader=X-Auth-Token, yourToken
+            # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
+            - RemoveRequestHeader=Cookie # 쿠키 제거
+            - name: CircuitBreaker # fall-back 전략 수행
+              args:
+                name: API-fallback
+                fallbackUri: forward:/fallback/query
+            - name: Retry # 502 발생 시, 지정한 횟수만큼 재시도
+              args:
+                retries: 2
+                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+                methods: POST
+            - name : SecureHeaders # client축 보안
+
+        - id: DocumentUpload
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/query/**
+          filters:
+            # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
             - RemoveRequestHeader=Cookie
-            - RewritePath=/ai/(?<segment>.*), /graphql/${segment}
-            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: DB-fallback
+                fallbackUri: forward:/fallback/external
+            - name: Retry
+              args:
+                retries: 2
+                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+                methods: POST
+            - name : SecureHeaders
+
+        - id: User
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/auth/test-login/**
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+                methods: POST
+            - name : SecureHeaders
+            - name: CircuitBreaker
+              args:
+                name: login-fallback
+                fallbackUri: forward:/fallback/login
   main:
     web-application-type: reactive

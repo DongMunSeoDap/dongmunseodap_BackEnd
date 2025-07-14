@@ -29,6 +29,7 @@ public class EmbeddingService {
         return embeddingClient.embed(text);
     }
 
+    // open api에서 받은 값을 인자로 받아, pincone(Vector DB)에 접근하여 비슷한 값을 원하는 개수만큼 가져오는 service
     public QueryResponseWithUnsignedIndices search(EmbeddingResponse embeddingResponse) {
 
         float[] input = embeddingResponse.embedding;
