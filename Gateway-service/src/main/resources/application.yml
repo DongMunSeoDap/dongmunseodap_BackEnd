@@ -1,76 +1,11 @@
-server:
-  port: 8000
-
-# Eureka Client 등록 설정
-eureka:
-  client:
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://parkjuyong:1234@localhost:8761/eureka/
-    fetch-registry: false
-  instance:
-    lease-renewal-interval-in-seconds: 30
-    lease-expiration-duration-in-seconds: 90
-
 spring:
-  application:
-    name: Gateway-service
-
   cloud:
-    gateway:
-      routes:
-        - id: DocumentSearch
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/upload-documents/**
-            - Path=/api/graphql/**
-          filters:
-            # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
-            - RemoveRequestHeader=Cookie # 쿠키 제거
-            - name: CircuitBreaker # fall-back 전략 수행
-              args:
-                name: API-fallback
-                fallbackUri: forward:/fallback/query
-            - name: Retry # 502, 504 발생 시 지정한 횟수만큼 재시도
-              args:
-                retries: 2
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-                methods: POST
-            - name : SecureHeaders # client축 보안
-
-        - id: DocumentUpload
-          uri: http://localhost:8080
-          predicates:
-            - Path=/api/upload-documents/**
-            - Path=/api/graphql/**
-          filters:
-            # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
-            - RemoveRequestHeader=Cookie
-            - name: CircuitBreaker
-              args:
-                name: DB-fallback
-                fallbackUri: forward:/fallback/external
-            - name: Retry
-              args:
-                retries: 2
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-                methods: POST
-            - name : SecureHeaders
-
-        - id: User
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/auth/test-login/**
-          filters:
-            - name: Retry
-              args:
-                retries: 2
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-                methods: POST
-            - name : SecureHeaders
-            - name: CircuitBreaker
-              args:
-                name: login-fallback
-                fallbackUri: forward:/fallback/login
-  main:
-    web-application-type: reactive #webFulx 기반 동작
+    config:
+      password: '1234'
+      username: parkjuyong
+      label: main
+      uri: http://localhost:8888
+  config:
+    import: 'configserver:'
+  application:
+    name: gateway-service
