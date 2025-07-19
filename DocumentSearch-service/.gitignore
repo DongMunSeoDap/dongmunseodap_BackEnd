@@ -38,7 +38,3 @@ out/
 ### VS Code ###
 .vscode/
 application.yml
-<<<<<<< HEAD
-application.yml
-=======
->>>>>>> a36b650 (0711: 테스트 성공할 수 있게 리팩토링)

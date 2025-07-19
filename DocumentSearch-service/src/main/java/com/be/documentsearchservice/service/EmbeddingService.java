@@ -1,9 +1,10 @@
 package com.be.documentsearchservice.service;
 
 
-
 import com.be.documentsearchservice.dto.EmbeddingResponse;
 import com.google.common.primitives.Floats;
+import com.google.protobuf.Struct;
+import com.google.protobuf.Value;
 import io.pinecone.clients.Index;
 import io.pinecone.configs.PineconeConfig;
 import io.pinecone.configs.PineconeConnection;
@@ -47,7 +48,15 @@ public class EmbeddingService {
         Index index = new Index(connection, "dongmunseodap-document-index-dev");
 
         List<Float> list = Floats.asList(input);
-        QueryResponseWithUnsignedIndices queryResponse =  index.query(10, list, null, null, null, null, null, false, true);
+        Struct filter = Struct.newBuilder()
+                .putFields("category", Value.newBuilder()
+                        .setStructValue(Struct.newBuilder()
+                                .putFields("$eq", Value.newBuilder()
+                                        .setStringValue("document_content")
+                                        .build()))
+                        .build())
+                .build();
+        QueryResponseWithUnsignedIndices queryResponse =  index.query(10, list, null, null, null, "__default__", filter, false, true);
 
         return queryResponse;
     }
