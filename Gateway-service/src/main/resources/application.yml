@@ -3,8 +3,8 @@ server:
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultzone: http://localhost:8761/eureka
 
@@ -14,9 +14,16 @@ spring:
 
   cloud:
     gateway:
+      server:
+        webflux:
+          observability:
+            enabled: true # 모니터링 - HTTP 메서드, 상태코드, 라우트ID, URI
+      discovery:
+        locator:
+          enabled: true
       routes:
-        - id: DocumentSearch
-          uri: http://localhost:8083
+        - id: DocumentSearch-service
+          uri: lb://DocumentSearch-service #uri에 lb://로 시작하게하여 로드벨런싱 설정
           predicates:
             - Path=/api/upload-documents/**
             - Path=/api/graphql/**
@@ -34,8 +41,8 @@ spring:
                 methods: POST
             - name : SecureHeaders # client축 보안
 
-        - id: DocumentUpload
-          uri: http://localhost:8081
+        - id: DocumentUpload-service
+          uri: lb://DocumentUpload-service
           predicates:
             - Path=/api/query/**
           filters:
@@ -52,8 +59,8 @@ spring:
                 methods: POST
             - name : SecureHeaders
 
-        - id: User
-          uri: http://localhost:8082
+        - id: User-service
+          uri: lb://User-service
           predicates:
             - Path=/api/auth/test-login/**
           filters:
