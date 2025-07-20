@@ -57,8 +57,6 @@ dependencies {
 	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	// pincone client
-	//implementation "io.pinecone:pinecone-client:5.1.0"
 
 	// Pinecone 클라이언트
 	implementation("io.pinecone:pinecone-client:2.1.0") {
