@@ -3,17 +3,15 @@ package com.be.documentsearchservice.controller;
 import com.be.documentsearchservice.dto.EmbeddingResponse;
 import com.be.documentsearchservice.dto.UserQuery;
 import com.be.documentsearchservice.service.EmbeddingService;
-import io.pinecone.unsigned_indices_model.QueryResponseWithUnsignedIndices;
-import io.pinecone.unsigned_indices_model.ScoredVectorWithUnsignedIndices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
+import static org.springframework.http.ResponseEntity.ok;
 
 
 @RestController
@@ -30,7 +28,7 @@ public class EmbeddingController {
         
     }
 
-    /*open api로 embedding한 값 받아오기만
+
     @GetMapping("/question")
     public ResponseEntity<EmbeddingResponse> embed(
             //@RequestParam(value = "message", defaultValue = "Tell me a joke") String message
@@ -41,10 +39,10 @@ public class EmbeddingController {
         float[] vec = embeddingService.embed(query);
         return ok(new EmbeddingResponse(query, vec));
     }
-    */
 
 
-    @PostMapping("/query")
+
+   /* @PostMapping("/query")
     public ResponseEntity<?> search(@RequestBody UserQuery uq) {
         String userId = uq.userId();
         String query = uq.query();
@@ -61,12 +59,10 @@ public class EmbeddingController {
         EmbeddingResponse embedding = new EmbeddingResponse(query, vec);
         QueryResponseWithUnsignedIndices resp = embeddingService.search(embedding);
 
-        ScoredVectorWithUnsignedIndices Response = resp.getMatches(5);
 
+        return ResponseEntity.ok(embeddingService.search(embedding));
 
-        return ResponseEntity.ok(Response); // DTO만 반환
-    }
-
+    }*/
 
 
 

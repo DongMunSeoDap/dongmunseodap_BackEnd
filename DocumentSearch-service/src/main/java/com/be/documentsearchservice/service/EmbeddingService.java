@@ -2,28 +2,28 @@ package com.be.documentsearchservice.service;
 
 
 import com.be.documentsearchservice.dto.EmbeddingResponse;
-import com.google.common.primitives.Floats;
-import io.pinecone.clients.Index;
-import io.pinecone.configs.PineconeConfig;
-import io.pinecone.configs.PineconeConnection;
-import io.pinecone.unsigned_indices_model.QueryResponseWithUnsignedIndices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.observation.conventions.VectorStoreProvider;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class EmbeddingService {
 
     private final EmbeddingModel embeddingClient;
+    private final EmbeddingModel embeddingModel;
+    private final VectorStoreProvider vectorStoreProvider;
     private EmbeddingService embeddingService;
     private EmbeddingResponse embeddingResponse;
     private static final Logger log = LoggerFactory.getLogger(EmbeddingService.class);
-    public EmbeddingService(EmbeddingModel embeddingClient) {
+    public EmbeddingService(EmbeddingModel embeddingClient, EmbeddingModel embeddingModel, VectorStoreProvider vectorStoreProvider) {
         this.embeddingClient = embeddingClient;
+        this.embeddingModel = embeddingModel;
+        this.vectorStoreProvider = vectorStoreProvider;
     }
 
     // open api 연동
@@ -31,7 +31,13 @@ public class EmbeddingService {
         return embeddingClient.embed(text);
     }
 
-    public QueryResponseWithUnsignedIndices search(EmbeddingResponse embeddingResponse) {
+    public List<Document> result(String text) {
+
+    }
+
+
+
+    /*public QueryResponseWithUnsignedIndices search(EmbeddingResponse embeddingResponse) {
 
         float[] input = embeddingResponse.embedding;
         if (input == null) {
@@ -45,11 +51,12 @@ public class EmbeddingService {
         Index index = new Index(connection, "dongmunseodap-document-index-dev");
 
         List<Float> list = Floats.asList(input);
-        QueryResponseWithUnsignedIndices queryResponse =  index.query(10, list, null, null, null, "manual-document", null, false, true);
+        QueryResponseWithUnsignedIndices queryResponse =  index.query(3, list, null, null, null, "manual-document", null, false, true);
+
 
         return queryResponse;
 
-    }
+    }*/
 
 
 
