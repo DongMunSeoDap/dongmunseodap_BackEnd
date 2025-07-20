@@ -41,9 +41,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// Swagger openapi-ui
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
-
 	// elasticSearch
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
@@ -63,6 +60,7 @@ dependencies {
 		// 다른 트랜지티브 protobuf-java 의존성은 제외
 		exclude group: "com.google.protobuf", module: "protobuf-java"
 	}
+
 	// Pinecone이 기대하는 Protobuf 버전 (여기서는 3.24.4)
 	implementation "com.google.protobuf:protobuf-java:3.24.4"
 
