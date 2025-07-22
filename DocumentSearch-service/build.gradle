@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.0'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.github.davidmc24.gradle.plugin.avro' version '1.2.0'
 }
 
 group = 'com.be'
@@ -15,10 +14,8 @@ java {
 }
 repositories {
 	mavenCentral()
-	// Kafka Avro serializer
-	maven {
-		url = 'https://packages.confluent.io/maven/' }
 }
+
 
 
 dependencies {
@@ -26,26 +23,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-logging'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// Kafka Avro
-	implementation 'io.confluent:kafka-avro-serializer:7.5.0'
-	implementation 'org.apache.avro:avro:1.11.1'
-
 	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	// elasticSearch
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-
-	// openai 및 pinecone(벡터DB)
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
 
 	// — EmbeddingModel 구현체
@@ -55,27 +41,29 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 
+	//implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 	// Pinecone 클라이언트
-	implementation("io.pinecone:pinecone-client:2.1.0") {
+	/*implementation("io.pinecone:pinecone-client:2.1.0") {
 		// 다른 트랜지티브 protobuf-java 의존성은 제외
 		exclude group: "com.google.protobuf", module: "protobuf-java"
-	}
+	}*/
 
+	implementation 'org.springframework.ai:spring-ai-pinecone-store';
+	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:0.8.1';
+	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 	// Pinecone이 기대하는 Protobuf 버전 (여기서는 3.24.4)
-	implementation "com.google.protobuf:protobuf-java:3.24.4"
-
+	//implementation "com.google.protobuf:protobuf-java:3.24.4"
 
 
 
 }
 
+/*
 configurations.all {
 	resolutionStrategy.force "com.google.protobuf:protobuf-java:3.24.4"
 }
+*/
 
-avro {
-	createSetters = false
-}
 sourceSets {
 	main {
 		java {
