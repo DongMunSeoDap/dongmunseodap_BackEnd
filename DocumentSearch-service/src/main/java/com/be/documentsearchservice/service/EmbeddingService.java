@@ -4,60 +4,26 @@ package com.be.documentsearchservice.service;
 import com.be.documentsearchservice.dto.EmbeddingResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.observation.conventions.VectorStoreProvider;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class EmbeddingService {
 
     private final EmbeddingModel embeddingClient;
     private final EmbeddingModel embeddingModel;
-    private final VectorStoreProvider vectorStoreProvider;
     private EmbeddingService embeddingService;
     private EmbeddingResponse embeddingResponse;
     private static final Logger log = LoggerFactory.getLogger(EmbeddingService.class);
-    public EmbeddingService(EmbeddingModel embeddingClient, EmbeddingModel embeddingModel, VectorStoreProvider vectorStoreProvider) {
+    public EmbeddingService(EmbeddingModel embeddingClient, EmbeddingModel embeddingModel) {
         this.embeddingClient = embeddingClient;
         this.embeddingModel = embeddingModel;
-        this.vectorStoreProvider = vectorStoreProvider;
     }
 
     // open api 연동
     public float[] embed(String text) {
         return embeddingClient.embed(text);
     }
-
-    public List<Document> result(String text) {
-
-    }
-
-
-
-    /*public QueryResponseWithUnsignedIndices search(EmbeddingResponse embeddingResponse) {
-
-        float[] input = embeddingResponse.embedding;
-        if (input == null) {
-            throw new IllegalArgumentException("Embedding is null. Did you call /embedding first?");
-        }
-        log.info(">>> first 5 values = {}", Arrays.toString(Arrays.copyOf(input, 5)));
-        PineconeConfig config = new PineconeConfig("pcsk_58CvBb_U2dfMdm48R9ayMTLRZ9E5Zn1xhf4GJ7wK1vWu1BWVKUHKRsbeVXExWbhzo73sYq");
-        config.setHost("https://dongmunseodap-document-index-dev-1a3x1qg.svc.aped-4627-b74a.pinecone.io");
-        PineconeConnection connection = new PineconeConnection(config);
-
-        Index index = new Index(connection, "dongmunseodap-document-index-dev");
-
-        List<Float> list = Floats.asList(input);
-        QueryResponseWithUnsignedIndices queryResponse =  index.query(3, list, null, null, null, "manual-document", null, false, true);
-
-
-        return queryResponse;
-
-    }*/
-
 
 
 }
