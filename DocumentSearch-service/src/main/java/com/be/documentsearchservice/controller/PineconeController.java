@@ -2,6 +2,7 @@ package com.be.documentsearchservice.controller;
 
 import com.be.documentsearchservice.dto.QueryRequest;
 import com.be.documentsearchservice.service.PineconeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,7 @@ import org.springframework.ai.document.Document;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/ai/search")
 public class PineconeController {
@@ -22,15 +24,17 @@ public class PineconeController {
     }
 
     @PostMapping("/query")
-    public ResponseEntity<List<Document>> handleQueryAndSearch(@RequestBody QueryRequest request) {
+    public List<Document> handleQueryAndSearch(@RequestBody QueryRequest request) {
         // 1. 로그 출력
         System.out.println("Received -> userId: " + request.getUserId() + ", content: " + request.getContent());
 
         // 2. 검색 실행
         List<Document> results = pineconeService.pineconeSearch(request);
+        System.out.println("Search result size: " + results.size());
+        System.out.println(results);
 
         // 3. 결과 반환
-        return ResponseEntity.ok(results);
+        return results;
     }
 
 

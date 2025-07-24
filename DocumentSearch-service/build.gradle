@@ -55,6 +55,8 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-openai'
 	implementation "org.springframework.ai:spring-ai-starter-model-openai:1.0.0"
 
+	implementation "org.springframework.ai:spring-ai-pinecone-store"
+
 	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
