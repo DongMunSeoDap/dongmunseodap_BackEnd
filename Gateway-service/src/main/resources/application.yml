@@ -25,10 +25,9 @@ spring:
           enabled: true
       routes:
         - id: DocumentSearch-service
-          uri: lb://DocumentSearch-service #test 돌릴 시에만 변경하는 것을 추천 ex http://localhost:8082
+          uri: lb:localhost:8081 #test 돌릴 시에만 변경하는 것을 추천 ex lb://DocumentUpload-service ->http://localhost:8082
           predicates:
-            - Path=/api/upload-documents/**
-            - Path=/api/graphql/**
+            - Path=/api/query/**
           filters:
             # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
             - RemoveRequestHeader=Cookie # 쿠키 제거
@@ -44,9 +43,10 @@ spring:
             - name : SecureHeaders # client축 보안
 
         - id: DocumentUpload-service
-          uri: lb://DocumentUpload-service
+          uri: http://localhost:8082 #test 돌릴 시에만 변경하는 것을 추천 ex lb://DocumentUpload-service ->http://localhost:8082
           predicates:
-            - Path=/api/query/**
+            - Path=/api/upload-documents/**
+            - Path=/api/graphql/**
           filters:
             # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
             - RemoveRequestHeader=Cookie
@@ -61,21 +61,21 @@ spring:
                 methods: POST
             - name : SecureHeaders
 
-        - id: User-service
-          uri: lb://User-service
-          predicates:
-            - Path=/api/auth/test-login/**
-          filters:
-            - name: Retry
-              args:
-                retries: 2
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-                methods: POST
-            - name : SecureHeaders
-            - name: CircuitBreaker
-              args:
-                name: login-fallback
-                fallbackUri: forward:/fallback/login
+#        - id: User-service
+#          uri: lb://User-service
+#          predicates:
+#            - Path=/api/auth/test-login/**
+#          filters:
+#            - name: Retry
+#              args:
+#                retries: 2
+#                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+#                methods: POST
+#            - name : SecureHeaders
+#            - name: CircuitBreaker
+#              args:
+#                name: login-fallback
+#                fallbackUri: forward:/fallback/login
   config:
     import: 'configserver:'
     application:
