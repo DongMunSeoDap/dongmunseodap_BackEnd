@@ -24,9 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class DocumentUploadService {
 
-  // private final DocumentRepository documentRepository;
-  // private final DocumentMapper documentMapper;
-
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
 
@@ -34,7 +31,7 @@ public class DocumentUploadService {
   public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
   {
 
-    String pdfUrl = uploadFile(pathName, file); // 문서 객체 Url
+    String pdfUrl = uploadFile(pathName, file); // 웹에서 접근 가능한 문서 객체 Url
 
     return UploadResponse.builder()
         .documentName(file.getOriginalFilename())
@@ -43,13 +40,13 @@ public class DocumentUploadService {
         .uploadedBy("admin") // 추후에 사용자 id로 확장
         .uploadedAt(LocalDateTime.now())
         .message("문서 업로드에 성공했습니다.")
-        .pdfUrl(pdfUrl) // 객체 url
+        .pdfUrl(pdfUrl)
         .build();
 
   }
 
   // 파일 업로드
-  public String uploadFile(PathName pathName, MultipartFile file) {
+  public String uploadFile(PathName pathName, MultipartFile file) { // 업로드 된 객체 url를 반환
 
     validateFile(file); // 파일 유료성 검사
 
@@ -73,6 +70,7 @@ public class DocumentUploadService {
 
       log.info("업로드 성공");
 
+      // 웹에서 직접 접근 가능한 http/https url 문자열 반환
       return amazonS3.getUrl(s3Config.getBucket(), KeyName).toString();
     } catch (Exception e) {
       log.error("S3 upload 중 오류 발생", e);
@@ -110,14 +108,15 @@ public class DocumentUploadService {
       throw new CustomException(S3ErrorCode.FILE_SIZE_INVALID);
     }
 
-    String contentType =file.getContentType();
+    String contentType =file.getContentType(); // 파일의 mime타입 반환
+    // getcontentType()은 보안상 좋지 않다는 의견 -> 파일 확장자 검사 로직 변경해야할까요?
 
     if(contentType == null || !contentType.equals("application/pdf")) { // pdf 형식만 허용
       throw new CustomException(S3ErrorCode.FILE_TYPE_INVALID);
     }
   }
 
-  // S3 파일 경로 생성 (여기서 keyName은 원본파일 이름)
+  // S3 파일 경로 생성 (여기서 keyName은 {documents/원본파일 이름})
   public String createKeyName(PathName pathName, String originalFilename) {
     return switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
