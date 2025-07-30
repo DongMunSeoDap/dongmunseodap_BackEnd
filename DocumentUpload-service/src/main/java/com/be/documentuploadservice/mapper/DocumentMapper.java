@@ -12,7 +12,7 @@ public class DocumentMapper { // Entity를 DTO로 변환해주는 메소드
         .documentId(UUID.randomUUID().toString())
         .status(document.getStatus())
         .message(document.getMessage())
-        .s3Path(document.getS3Path())
+        .s3Key(document.getS3Key())
         .build();
   }
 
