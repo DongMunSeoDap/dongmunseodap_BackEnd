@@ -17,9 +17,9 @@ public class UploadResponse {
 
   private String documentId;
 
-  private String documentName;
+  private String documentName; // 원본 파일 이름
 
-  private String s3Path; // s3 저장 경로
+  private String s3Key; // s3 객체 키
 
   private LocalDateTime uploadedAt;
 

@@ -24,7 +24,7 @@ public class Document { // -> es 연동 시 다시 설정
 
   // 파일 업로드 관련 정보
   private String documentName;
-  private String s3Path; // S3 저장 경로
+  private String s3Key; // S3 객체 키
 
 /*  // 이벤트 컨텍스트 정보
   private String version;
