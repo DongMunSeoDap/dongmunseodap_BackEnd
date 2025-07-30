@@ -20,10 +20,20 @@ public class PineconeService {
         this.embeddingModel = embeddingModel;
     }
 
-    public List<Document> pineconeSearch(QueryRequest qr) {
-        List<Document> results = vectorStoreConfig.pineconeVectorStore(embeddingModel).similaritySearch(
-                SearchRequest.builder().query(qr.getContent()).topK(3).build()
+    public String inQuery(QueryRequest qr){
+        String content = qr.getContent();
+        return content;
+    }
+
+    public List<Document> pineconeSearch(QueryRequest queryRequest) {
+        String content = queryRequest.getContent();
+
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("Query content must not be null or blank");
+        }
+
+        return vectorStoreConfig.pineconeVectorStore(embeddingModel).similaritySearch(
+                SearchRequest.builder().query(content).topK(3).build()
         );
-        return results;
     }
 }
