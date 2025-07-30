@@ -13,6 +13,7 @@ import com.be.documentuploadservice.global.exception.CustomException;
 import com.be.documentuploadservice.mapper.DocumentMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,14 +29,13 @@ public class DocumentUploadService {
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
 
   // 문서 업로드
-  public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
-  {
+  public UploadResponse uploadDocuments(PathName pathName, MultipartFile file) {
 
     String pdfUrl = uploadFile(pathName, file); // 웹에서 접근 가능한 문서 객체 Url
 
     return UploadResponse.builder()
         .documentName(file.getOriginalFilename())
-        .s3Path(createKeyName(pathName, file.getOriginalFilename())) // s3 저장 경로
+        .s3Key(createKeyName(pathName, file.getOriginalFilename())) // 고유성 보장
         .status(UplaodStatus.SUCCESS)
         .uploadedBy("admin") // 추후에 사용자 id로 확장
         .uploadedAt(LocalDateTime.now())
@@ -45,8 +45,8 @@ public class DocumentUploadService {
 
   }
 
-  // 파일 업로드
-  public String uploadFile(PathName pathName, MultipartFile file) { // 업로드 된 객체 url를 반환
+  // 파일 업로드 로직 + 객체 경로 반환
+  public String uploadFile(PathName pathName, MultipartFile file) {
 
     validateFile(file); // 파일 유료성 검사
 
@@ -118,11 +118,21 @@ public class DocumentUploadService {
 
   // S3 파일 경로 생성 (여기서 keyName은 {documents/원본파일 이름})
   public String createKeyName(PathName pathName, String originalFilename) {
-    return switch (pathName) {
+    String basePath = switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
-    }
-        + "/"
-        + originalFilename; // 원본 파일 이름
+    };
 
+    String uuid = UUID.randomUUID().toString(); // key 값을 식별 할 uuid 문자열 생성
+    String fileExtension = getFileExtension(originalFilename); // 파일 확장자 추출
+
+    return basePath + "/" + uuid + fileExtension; // 고유성은 보장하지만 원본파일 이름 추척이 힘들거 같음
+  }
+
+  // 파일 확장자 추출(".pdf"로 추출)
+  private String getFileExtension(String filename) {
+    if (filename == null || !filename.contains(".")) {
+      return "";
+    }
+    return filename.substring(filename.lastIndexOf("."));
   }
 }
