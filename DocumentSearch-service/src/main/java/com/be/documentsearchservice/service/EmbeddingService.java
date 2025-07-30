@@ -1,7 +1,6 @@
 package com.be.documentsearchservice.service;
 
 
-import com.be.documentsearchservice.dto.EmbeddingResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -13,7 +12,6 @@ public class EmbeddingService {
     private final EmbeddingModel embeddingClient;
     private final EmbeddingModel embeddingModel;
     private EmbeddingService embeddingService;
-    private EmbeddingResponse embeddingResponse;
     private static final Logger log = LoggerFactory.getLogger(EmbeddingService.class);
     public EmbeddingService(EmbeddingModel embeddingClient, EmbeddingModel embeddingModel) {
         this.embeddingClient = embeddingClient;

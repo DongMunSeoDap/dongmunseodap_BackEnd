@@ -12,19 +12,35 @@ java {
 		languageVersion.set(JavaLanguageVersion.of(21))
 	}
 }
-repositories {
-	mavenCentral()
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.0.0"
+	}
 }
 
 
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven {
+		name = 'Central Portal Snapshots'
+		url = 'https://central.sonatype.com/repository/maven-snapshots/'
+	}
+}
+
+ext {
+	set('springAiVersion', "1.0.0")
+}
 
 dependencies {
 	// Spring Boot 기본 설정
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-logging'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -33,8 +49,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-
 	// — EmbeddingModel 구현체
+	implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+	// Replace the following with the starter dependencies of specific modules you wish to use
+	implementation 'org.springframework.ai:spring-ai-openai'
 	implementation "org.springframework.ai:spring-ai-starter-model-openai:1.0.0"
 
 	implementation "org.springframework.ai:spring-ai-pinecone-store"
@@ -42,43 +60,17 @@ dependencies {
 
 	// Spring WebFlux (만약 WebClient 직접 쓰실 경우)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-
-	//implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
-	// Pinecone 클라이언트
-	/*implementation("io.pinecone:pinecone-client:2.1.0") {
-		// 다른 트랜지티브 protobuf-java 의존성은 제외
-		exclude group: "com.google.protobuf", module: "protobuf-java"
-	}*/
-
-	implementation 'org.springframework.ai:spring-ai-pinecone-store';
-	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:0.8.1';
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
-	// Pinecone이 기대하는 Protobuf 버전 (여기서는 3.24.4)
-	//implementation "com.google.protobuf:protobuf-java:3.24.4"
-
-
-
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-/*
-configurations.all {
-	resolutionStrategy.force "com.google.protobuf:protobuf-java:3.24.4"
-}
-*/
-
-sourceSets {
-	main {
-		java {
-			srcDirs = ['src/main/java']
-		}
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
 	}
 }
-
-springBoot {
-	mainClass.set('com.be.documentsearchservice.DocumentSearchServiceApplication')
-}
-
 
 tasks.named('test') {
 	useJUnitPlatform()
