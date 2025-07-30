@@ -1,84 +1,15 @@
-server:
-  port: 8080
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultzone: http://localhost:8761/eureka
-
 spring:
   cloud:
-    config:
-      password: '1234'
-      username: parkjuyong
-      label: main
-      uri: http://localhost:8888
     gateway:
-      server:
-        webflux:
-          observability:
-            enabled: true # 모니터링 - HTTP 메서드, 상태코드, 라우트ID, URI
-      discovery:
-        locator:
-          enabled: true
       routes:
-        - id: DocumentSearch-service
-          uri: http://localhost:8082 #test 돌릴 시에만 변경하는 것을 추천 ex lb://DocumentUpload-service ->http://localhost:8082
+        - id: dongmunseodap
+          uri: https://dongmunseodap-service
           predicates:
-            - Path=/api/query/**
+            - Path=/api/upload-documents,/api/graphql,/api/auth/test-login,/api/query
           filters:
-            # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
-            - RemoveRequestHeader=Cookie # 쿠키 제거
-            - name: CircuitBreaker # fall-back 전략 수행
-              args:
-                name: API-fallback
-                fallbackUri: forward:/fallback/query
-            - name: Retry # 502 발생 시, 지정한 횟수만큼 재시도
-              args:
-                retries: 2
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-                methods: POST
-            - name : SecureHeaders # client축 보안
-
-        - id: DocumentUpload-service
-          uri: http://localhost:8081 #test 돌릴 시에만 변경하는 것을 추천 ex lb://DocumentUpload-service ->http://localhost:8081
-          predicates:
-            - Path=/api/upload-documents/**
-            - Path=/api/graphql/**
-          filters:
-            # - AddRequestHeader=X-Auth-Token, #{tokenProvider.getToken()}
+            - AddRequestHeader=X-Auth-Token, yourToken
             - RemoveRequestHeader=Cookie
-            - name: CircuitBreaker
-              args:
-                name: DB-fallback
-                fallbackUri: forward:/fallback/external
-            - name: Retry
-              args:
-                retries: 2
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-                methods: POST
-            - name : SecureHeaders
-
-  #        - id: User-service
-  #          uri: lb://User-service
-  #          predicates:
-  #            - Path=/api/auth/test-login/**
-  #          filters:
-  #            - name: Retry
-  #              args:
-  #                retries: 2
-  #                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-  #                methods: POST
-  #            - name : SecureHeaders
-  #            - name: CircuitBreaker
-  #              args:
-  #                name: login-fallback
-  #                fallbackUri: forward:/fallback/login
-  config:
-    import: 'configserver:'
-    application:
-      name: gateway-service
+            - RewritePath=/ai/(?<segment>.*), /graphql/${segment}
+            - TokenRelay
   main:
     web-application-type: reactive
