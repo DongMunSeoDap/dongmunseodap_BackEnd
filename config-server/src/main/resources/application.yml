@@ -8,4 +8,4 @@ spring:
   config:
     import: 'configserver:'
   application:
-    name: gateway-service
+    name: config-server

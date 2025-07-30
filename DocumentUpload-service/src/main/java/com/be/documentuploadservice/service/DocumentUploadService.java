@@ -29,7 +29,8 @@ public class DocumentUploadService {
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
 
   // 문서 업로드
-  public UploadResponse uploadDocuments(PathName pathName, MultipartFile file) {
+  public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
+  {
 
     String pdfUrl = uploadFile(pathName, file); // 웹에서 접근 가능한 문서 객체 Url
 
