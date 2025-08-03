@@ -1,5 +1,5 @@
 package com.be.documentuploadservice.entity;
 
-public enum UplaodStatus {
+public enum UploadStatus {
   SUCCESS, FAILURE
 }
