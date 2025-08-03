@@ -6,11 +6,10 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.be.documentuploadservice.dto.response.UploadResponse;
 import com.be.documentuploadservice.entity.PathName;
-import com.be.documentuploadservice.entity.UplaodStatus;
+import com.be.documentuploadservice.entity.UploadStatus;
 import com.be.documentuploadservice.exception.S3ErrorCode;
 import com.be.documentuploadservice.global.config.S3Config;
 import com.be.documentuploadservice.global.exception.CustomException;
-import com.be.documentuploadservice.mapper.DocumentMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -35,9 +34,9 @@ public class DocumentUploadService {
     String pdfUrl = uploadFile(pathName, file); // 웹에서 접근 가능한 문서 객체 Url
 
     return UploadResponse.builder()
-        .documentName(file.getOriginalFilename())
+        .fileName(file.getOriginalFilename())
         .s3Key(createKeyName(pathName, file.getOriginalFilename())) // 고유성 보장
-        .status(UplaodStatus.SUCCESS)
+        .status(UploadStatus.SUCCESS)
         .uploadedBy("admin") // 추후에 사용자 id로 확장
         .uploadedAt(LocalDateTime.now())
         .message("문서 업로드에 성공했습니다.")
