@@ -30,7 +30,7 @@ public class PineconeController {
 
 
         // 2. 검색 실행
-        ChatResponse resp = chatService.search(request);
+        ChatResponse resp = chatService.search_ongoing(request);
 
         System.out.println("최종 결과:" + resp);
 
