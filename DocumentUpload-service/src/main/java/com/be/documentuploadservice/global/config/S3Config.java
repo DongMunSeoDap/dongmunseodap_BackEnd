@@ -31,7 +31,7 @@ public class S3Config {
   private String bucket;
 
   @Value("${cloud.aws.s3.path.documents}")
-  private String userDocumentsPath; // s3는 평면 구조 이지만 keyName에 접두사를 통해 폴더구조 시뮬레이션 가능
+  private String userDocumentsPath;
 
   @PostConstruct // 의존성 주입이 완료된 후 실행(access/seceret key 의존성 주입 후 사용 목적)
   public void init() { // AWS S3에 접근하기 위한 자격 증명 객체 초기화

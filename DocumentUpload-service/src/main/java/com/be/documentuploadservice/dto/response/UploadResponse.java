@@ -1,6 +1,6 @@
 package com.be.documentuploadservice.dto.response;
 
-import com.be.documentuploadservice.entity.UplaodStatus;
+import com.be.documentuploadservice.entity.UploadStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,24 +15,33 @@ import lombok.Setter;
 @Setter
 public class UploadResponse {
 
-  private String documentId;
+  private String fileId;
 
-  private String documentName;
+  private String fileName; // 원본 파일 이름
 
-  private String s3Path; // s3 저장 경로
+  private String s3Key; // s3 객체 키
 
   private LocalDateTime uploadedAt;
 
   private String uploadedBy;
 
-  private UplaodStatus status; // 서버 내부처리 결과
-
-  private String message; // FAILURE시 오류 메세지 출력
+  private UploadStatus status; // 서버 내부처리 결과
 
   private String pdfUrl; // s3 버킷 안에 있는 객체 url
 
+  private String message; // 완료 메세지
+
   @Override
   public String toString() {
-    return "UploadResponse{documentId='" + documentId + "', status='" + status + "', message='" + message + "'}";
+    return "UploadResponse{" +
+        "documentId='" + documentId + '\'' +
+        ", documentName='" + documentName + '\'' +
+        ", s3Key='" + s3Key + '\'' +
+        ", uploadedAt=" + uploadedAt +
+        ", uploadedBy='" + uploadedBy + '\'' +
+        ", status=" + status +
+        ", pdfUrl='" + pdfUrl + '\'' +
+        ", message='" + message + '\'' +
+        '}';
   }
 }
