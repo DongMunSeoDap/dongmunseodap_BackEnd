@@ -1,12 +1,9 @@
 package com.be.documentuploadservice.dto.response;
 
 import com.be.documentuploadservice.entity.UploadStatus;
+import lombok.*;
+
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Builder
 @NoArgsConstructor
@@ -31,17 +28,4 @@ public class UploadResponse {
 
   private String message; // 완료 메세지
 
-  @Override
-  public String toString() {
-    return "UploadResponse{" +
-        "documentId='" + documentId + '\'' +
-        ", documentName='" + documentName + '\'' +
-        ", s3Key='" + s3Key + '\'' +
-        ", uploadedAt=" + uploadedAt +
-        ", uploadedBy='" + uploadedBy + '\'' +
-        ", status=" + status +
-        ", pdfUrl='" + pdfUrl + '\'' +
-        ", message='" + message + '\'' +
-        '}';
-  }
 }
