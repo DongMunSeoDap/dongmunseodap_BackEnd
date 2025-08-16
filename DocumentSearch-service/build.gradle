@@ -64,6 +64,17 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-starter-vector-store-pinecone'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+	// Swagger openapi-ui
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
+
+	// spring cloud config
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+	// eureka-clinet
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 dependencyManagement {

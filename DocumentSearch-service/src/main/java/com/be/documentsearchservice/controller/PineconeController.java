@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
-@RequestMapping("/ai")
+@RequestMapping("/api")
 public class PineconeController {
 
     private final ChatService chatService;
