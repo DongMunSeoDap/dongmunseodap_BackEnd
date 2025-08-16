@@ -4,7 +4,6 @@ package com.be.documentsearchservice.config;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pinecone.PineconeVectorStore;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -16,7 +15,7 @@ public class VectorStoreConfig {
         this.embeddingModel = embeddingModel;
     }
 
-    @Bean
+
     public VectorStore pineconeVectorStore(EmbeddingModel embeddingModel) {
         String apiKey = "pcsk_4sPMm5_QbgeMF251gB9Bfd8m8FRq7G8G8kqvt5ysFXjwwPmoyR8CwMbdhcYi3VwV4Mr4Hw";
 
