@@ -2,7 +2,6 @@ package com.be.documentuploadservice.entity;
 
 import java.time.LocalDateTime;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
