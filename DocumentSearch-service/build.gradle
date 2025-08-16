@@ -68,6 +68,10 @@ dependencies {
 	// spring cloud config
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
+	// eureka-clinet
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 dependencyManagement {
