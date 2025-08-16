@@ -40,7 +40,7 @@ public class Document { // -> es 연동 시 다시 설정
   private String language;
 
   // 업로드 상태
-  private UplaodStatus status; // SUCCESS or FAILURE
+  private UploadStatus status; // SUCCESS or FAILURE
   private String message; // 실패시 메시지
 
 }
