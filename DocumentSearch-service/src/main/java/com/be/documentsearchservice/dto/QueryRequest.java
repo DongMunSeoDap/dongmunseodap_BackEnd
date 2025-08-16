@@ -3,22 +3,15 @@ package com.be.documentsearchservice.dto;
 // QueryRequest.java
 
 public class QueryRequest {
-    private String userId;
+    private long userId;
     private String content;
 
-    public String getUserId() {
+    public long getUserId() {
         return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
 }
