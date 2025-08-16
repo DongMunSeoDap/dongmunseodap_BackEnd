@@ -1,15 +1,11 @@
 spring:
   cloud:
-    gateway:
-      routes:
-        - id: dongmunseodap
-          uri: https://dongmunseodap-service
-          predicates:
-            - Path=/api/upload-documents,/api/graphql,/api/auth/test-login,/api/query
-          filters:
-            - AddRequestHeader=X-Auth-Token, yourToken
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/ai/(?<segment>.*), /graphql/${segment}
-            - TokenRelay
-  main:
-    web-application-type: reactive
+    config:
+      password: '1234'
+      username: parkjuyong
+      label: main
+      uri: http://localhost:8888
+  config:
+    import: 'configserver:'
+  application:
+    name: Gateway-service

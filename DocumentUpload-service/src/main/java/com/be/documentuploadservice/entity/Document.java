@@ -2,7 +2,6 @@ package com.be.documentuploadservice.entity;
 
 import java.time.LocalDateTime;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,7 +40,7 @@ public class Document { // -> es 연동 시 다시 설정
   private String language;
 
   // 업로드 상태
-  private UplaodStatus status; // SUCCESS or FAILURE
+  private UploadStatus status; // SUCCESS or FAILURE
   private String message; // 실패시 메시지
 
 }

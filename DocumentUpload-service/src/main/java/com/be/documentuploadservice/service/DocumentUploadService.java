@@ -6,13 +6,13 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.be.documentuploadservice.dto.response.UploadResponse;
 import com.be.documentuploadservice.entity.PathName;
-import com.be.documentuploadservice.entity.UplaodStatus;
+import com.be.documentuploadservice.entity.UploadStatus;
 import com.be.documentuploadservice.exception.S3ErrorCode;
 import com.be.documentuploadservice.global.config.S3Config;
 import com.be.documentuploadservice.global.exception.CustomException;
-import com.be.documentuploadservice.mapper.DocumentMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class DocumentUploadService {
 
-  // private final DocumentRepository documentRepository;
-  // private final DocumentMapper documentMapper;
-
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
 
@@ -34,21 +31,21 @@ public class DocumentUploadService {
   public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
   {
 
-    String pdfUrl = uploadFile(pathName, file); // 문서 객체 Url
+    String pdfUrl = uploadFile(pathName, file); // 웹에서 접근 가능한 문서 객체 Url
 
     return UploadResponse.builder()
-        .documentName(file.getOriginalFilename())
-        .s3Path(createKeyName(pathName, file.getOriginalFilename())) // s3 저장 경로
-        .status(UplaodStatus.SUCCESS)
+        .fileName(file.getOriginalFilename())
+        .s3Key(createKeyName(pathName, file.getOriginalFilename())) // 고유성 보장
+        .status(UploadStatus.SUCCESS)
         .uploadedBy("admin") // 추후에 사용자 id로 확장
         .uploadedAt(LocalDateTime.now())
         .message("문서 업로드에 성공했습니다.")
-        .pdfUrl(pdfUrl) // 객체 url
+        .pdfUrl(pdfUrl)
         .build();
 
   }
 
-  // 파일 업로드
+  // 파일 업로드 로직 + 객체 경로 반환
   public String uploadFile(PathName pathName, MultipartFile file) {
 
     validateFile(file); // 파일 유료성 검사
@@ -73,6 +70,7 @@ public class DocumentUploadService {
 
       log.info("업로드 성공");
 
+      // 웹에서 직접 접근 가능한 http/https url 문자열 반환
       return amazonS3.getUrl(s3Config.getBucket(), KeyName).toString();
     } catch (Exception e) {
       log.error("S3 upload 중 오류 발생", e);
@@ -110,20 +108,31 @@ public class DocumentUploadService {
       throw new CustomException(S3ErrorCode.FILE_SIZE_INVALID);
     }
 
-    String contentType =file.getContentType();
+    String contentType =file.getContentType(); // 파일의 mime타입 반환
+    // getcontentType()은 보안상 좋지 않다는 의견 -> 파일 확장자 검사 로직 변경해야할까요?
 
     if(contentType == null || !contentType.equals("application/pdf")) { // pdf 형식만 허용
       throw new CustomException(S3ErrorCode.FILE_TYPE_INVALID);
     }
   }
 
-  // S3 파일 경로 생성 (여기서 keyName은 원본파일 이름)
+  // S3 파일 경로 생성 (여기서 keyName은 {documents/원본파일 이름})
   public String createKeyName(PathName pathName, String originalFilename) {
-    return switch (pathName) {
+    String basePath = switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
-    }
-        + "/"
-        + originalFilename; // 원본 파일 이름
+    };
 
+    String uuid = UUID.randomUUID().toString(); // key 값을 식별 할 uuid 문자열 생성
+    String fileExtension = getFileExtension(originalFilename); // 파일 확장자 추출
+
+    return basePath + "/" + uuid + fileExtension; // 고유성은 보장하지만 원본파일 이름 추척이 힘들거 같음
+  }
+
+  // 파일 확장자 추출(".pdf"로 추출)
+  private String getFileExtension(String filename) {
+    if (filename == null || !filename.contains(".")) {
+      return "";
+    }
+    return filename.substring(filename.lastIndexOf("."));
   }
 }
