@@ -46,6 +46,12 @@ dependencies {
     // spring cloud config
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
+    // kafka
+    implementation 'org.springframework.cloud:spring-cloud-starter-bus-kafka'
+
+    //actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
