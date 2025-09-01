@@ -34,13 +34,8 @@ public class DocumentUploadService {
     String pdfUrl = uploadFile(pathName, file); // 웹에서 접근 가능한 문서 객체 Url
 
     return UploadResponse.builder()
-        .fileName(file.getOriginalFilename())
+        .traceId(createTraceId())
         .s3Key(createKeyName(pathName, file.getOriginalFilename())) // 고유성 보장
-        .status(UploadStatus.SUCCESS)
-        .uploadedBy("admin") // 추후에 사용자 id로 확장
-        .uploadedAt(LocalDateTime.now())
-        .message("문서 업로드에 성공했습니다.")
-        .pdfUrl(pdfUrl)
         .build();
 
   }
@@ -116,7 +111,7 @@ public class DocumentUploadService {
     }
   }
 
-  // S3 파일 경로 생성 (여기서 keyName은 {documents/원본파일 이름})
+  // S3 파일 경로 생성
   public String createKeyName(PathName pathName, String originalFilename) {
     String basePath = switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
@@ -135,4 +130,9 @@ public class DocumentUploadService {
     }
     return filename.substring(filename.lastIndexOf("."));
   }
+
+  private String createTraceId() {
+    return UUID.randomUUID().toString();
+  }
+
 }
