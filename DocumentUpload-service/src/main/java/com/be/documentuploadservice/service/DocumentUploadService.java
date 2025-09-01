@@ -111,7 +111,7 @@ public class DocumentUploadService {
     }
   }
 
-  // S3 파일 경로 생성 (여기서 keyName은 {documents/원본파일 이름})
+  // S3 파일 경로 생성
   public String createKeyName(PathName pathName, String originalFilename) {
     String basePath = switch (pathName) {
       case DOCUMENTS ->s3Config.getUserDocumentsPath();
