@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "com.github.davidmc24.gradle.plugin.avro" version "1.5.0"
 }
 
 group = 'com.be'
@@ -15,6 +16,9 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://packages.confluent.io/maven/'
+    }
 }
 
 dependencyManagement {
@@ -41,7 +45,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-
     // graphql
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
 
@@ -61,8 +64,39 @@ dependencies {
 
     // es
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+    // avro
+    implementation "io.confluent:kafka-avro-serializer:7.5.0"
+
+}
+
+// 생성된 Avro Java 클래스를 소스로 포함
+sourceSets {
+    main {
+        java {
+            srcDirs += 'build/generated-main-avro-java'
+        }
+    }
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+sourceSets {
+    main{
+        java {
+            srcDirs += 'build/generated-main-avro-java'
+        }
+    }
+}
+
+springBoot {
+    mainClass = 'com.be.documentuploadservice.DocumentUploadServiceApplication'
+}
+
+compileJava.dependsOn generateAvroJava
