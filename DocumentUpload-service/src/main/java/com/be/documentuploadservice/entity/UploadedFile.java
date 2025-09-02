@@ -11,11 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-
-import java.time.LocalDateTime;
 
 @Builder
 @NoArgsConstructor
@@ -24,7 +20,7 @@ import java.time.LocalDateTime;
 @Setter
 @Document(indexName = "file_meta") // 인데스 이름
 
-public class File { // es 저장
+public class UploadedFile { // es 저장
 
   @Id
   @Field(type = FieldType.Long)
