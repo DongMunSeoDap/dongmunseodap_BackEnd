@@ -5,7 +5,27 @@ spring:
       username: parkjuyong
       label: main
       uri: http://localhost:8888
+    bus:
+      enabled: true
+      refresh:
+        enabled: true
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      default-binder: kafka
   config:
     import: 'configserver:'
   application:
     name: eureka-server
+
+# Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, bus-refresh, health, info
+  endpoint:
+    health:
+      show-details: always
+
