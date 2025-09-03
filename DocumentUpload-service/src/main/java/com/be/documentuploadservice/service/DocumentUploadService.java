@@ -11,7 +11,6 @@ import com.be.documentuploadservice.entity.UploadStatus;
 import com.be.documentuploadservice.exception.S3ErrorCode;
 import com.be.documentuploadservice.global.config.S3Config;
 import com.be.documentuploadservice.global.exception.CustomException;
-import com.be.documentuploadservice.repository.FileElasticSearchRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -29,35 +29,51 @@ public class DocumentUploadService {
 
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
-  private final FileElasticSearchRepository fileElasticSearchRepository;
+  // private final FileElasticSearchRepository fileElasticSearchRepository;
+  private final DocumentEventProducer documentEventProducer;
 
   // 문서 업로드(s3 저장 + es 저장)
+  @Transactional
   public UploadResponse uploadDocuments(PathName pathName, MultipartFile file)
   {
+    String s3Key = createKeyName(pathName, file.getOriginalFilename());
+    String traceId = createTraceId(); // traceId 생성
 
-    String s3key = createKeyName(pathName, file.getOriginalFilename());
+    try {
+      // S3에 파일 업로드
+      uploadFile(pathName, file);
+      log.info("S3 업로드 완료: {}", s3Key);
 
-    // Elasticsearch에 메타데이터 저장
-    UploadedFile fileEntity = UploadedFile.builder()
-        .fileName(file.getOriginalFilename())
-        .s3Key(s3key)
-        .uploadedBy("admin")
-        .uploadedAt(LocalDateTime.now())
-        .status(UploadStatus.SUCCESS)
-        .message("Event Publish Success")
-        .build();
+      // Elasticsearch에 메타데이터 저장
+      UploadedFile fileEntity = UploadedFile.builder()
+          .fileName(file.getOriginalFilename())
+          .s3Key(s3Key)
+          .uploadedBy("admin")
+          .uploadedAt(LocalDateTime.now())
+          .status(UploadStatus.SUCCESS)
+          .message("파일 업로드 성공")
+          .build();
 
-    log.info("Elasticsearch 저장 완료: fileId={}", fileEntity.getFileId());
+      /*UploadedFile savedEntity = fileElasticSearchRepository.save(fileEntity);
+      log.info("Elasticsearch 저장 완료: fileId={}", savedEntity.getFileId());*/
 
-    uploadFile(pathName, file); // s3 업로드
+      // Kafka 이벤트 발행
+      documentEventProducer.publishDocumentEvent(
+          fileEntity, // 추후에 es에 저장된 엔티티로 변경
+          s3Key,
+          traceId,
+          file.getContentType()
+      );
 
-    log.info("S3 업로드 완료: fileId={}", fileEntity.getFileId());
+      return UploadResponse.builder()
+          .traceId(traceId)
+          .s3Key(s3Key)
+          .build();
 
-    return UploadResponse.builder()
-        .traceId(createTraceId())
-        .s3Key(s3key) // 고유성 보장
-        .build();
-
+    } catch (Exception e) {
+      log.error("파일 업로드 중 오류 발생: traceId={}", traceId, e);
+      throw new CustomException(S3ErrorCode.FILE_SERVER_ERROR);
+    }
   }
 
   // 파일 업로드 로직
