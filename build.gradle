@@ -50,10 +50,11 @@ subprojects { // 서브 프로젝트에 대한 설정
             // Test
             testImplementation 'org.springframework.boot:spring-boot-starter-test'
             testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
         }
 
         bootJar {
-            enabled = false
+            enabled = true
         }
 
         jar {
@@ -68,9 +69,9 @@ tasks.named('test') {
 
 // 최상위 프로젝트에서는 bootjar와 jar 모두 비활성화 되어 있음, 실제로는 서브 프로젝트에서만 jar를 만듦
 bootJar {
-    enabled = false
+    enabled = true
 }
 
 jar {
-    enabled = false
+    enabled = true
 }

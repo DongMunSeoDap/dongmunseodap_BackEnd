@@ -1,0 +1,38 @@
+{
+  "properties": [
+    {
+      "name": "spring.ai.openai.base-url",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.openai.base-url."
+    },
+    {
+      "name": "spring.ai.openai.api-key",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.openai.api-key."
+    },
+    {
+      "name": "spring.ai.openai.embedding.options.model",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.openai.embedding.options.model."
+    },
+    {
+      "name": "spring.ai.vectorstore.pinecone.index-name",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.vectorstore.pinecone.index-name."
+    },
+    {
+      "name": "spring.ai.vectorstore.pinecone.api-key",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.vectorstore.pinecone.api-key."
+    },
+    {
+      "name": "spring.ai.vectorstore.pinecone.environment",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.vectorstore.pinecone.environment."
+    },
+    {
+      "name": "spring.ai.vectorstore.pinecone.host",
+      "type": "java.lang.String",
+      "description": "Description for spring.ai.vectorstore.pinecone.host."
+    }
+  ] }

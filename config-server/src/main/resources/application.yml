@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    config:
+      password: '1234'
+      username: parkjuyong
+      label: main
+      uri: http://localhost:8888
+  config:
+    import: 'configserver:'
+  application:
+    name: config-server
