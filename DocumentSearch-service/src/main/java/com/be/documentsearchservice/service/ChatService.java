@@ -56,6 +56,13 @@ public class ChatService {
                 .map(chunk -> "- " + chunk.getText())
                 .collect(Collectors.joining("\n"));
 
+        String chunkContent = chunks.stream()
+                .map(chunk -> "[index: " + chunk.getChunkIndex()+"]")
+                .collect(Collectors.joining("\n"));
+
+        log.info("chunkContext: " + chunkContext);
+        log.info("chunkContent:\n{}", chunkContent);
+
         // 3. GPT 응답 생성
         ChatClient chatClient = ChatClient.builder(chatModel)
                 .defaultAdvisors(
