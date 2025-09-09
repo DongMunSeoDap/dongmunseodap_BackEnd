@@ -25,14 +25,24 @@ public class DocumentUploadController {
 
   private final DocumentUploadService documentUploadService;
 
-  @Operation(summary = "문서 업로드 API", description = "문서를 업로드하고 메타정보를 리턴하는 API")
+  // @Operation(summary = "문서 업로드 API", description = "문서를 업로드하고 메타정보를 리턴하는 API")
   @PostMapping(value = "/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<BaseResponse<UploadResponse>> uploadImage(
+  public ResponseEntity<BaseResponse<UploadResponse>> uploadFile(
       @RequestParam PathName pathName, MultipartFile file) {
 
     UploadResponse uploadResponse = documentUploadService.uploadDocuments(pathName, file);
     return ResponseEntity.ok(BaseResponse.success("문서 업로드에 성공했습니다.", uploadResponse));
   }
+
+  /*// test
+  @RestController
+  @RequestMapping("/api")
+  public class HelloController {
+      @GetMapping("/hello")
+      public String hello() {
+          return "Hello World!";
+      }
+  }*/
 
   /*@Operation(summary = "S3에 업로드 된 문서 조회 API", description = "S3에 업로드 된 문서를 조회하고 문서 url을 반환받는 API")
   @GetMapping("/document-list")
