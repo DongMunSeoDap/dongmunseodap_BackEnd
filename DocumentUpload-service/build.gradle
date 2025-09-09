@@ -72,8 +72,10 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 
-    // avro
-    implementation "io.confluent:kafka-avro-serializer:7.5.0"
+    // avro - Swagger 의존성 제외
+    implementation("io.confluent:kafka-avro-serializer:7.5.0") {
+        exclude group: "io.swagger.core.v3", module: "swagger-annotations"
+    }
 
 }
 
