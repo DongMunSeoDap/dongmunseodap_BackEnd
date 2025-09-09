@@ -5,8 +5,11 @@ import com.be.documentuploadservice.Meta;
 import com.be.documentuploadservice.Payload;
 import com.be.documentuploadservice.entity.UploadedFile;
 import com.be.documentuploadservice.exception.KafkaErrorCode;
+import com.be.documentuploadservice.exception.S3ErrorCode;
 import com.be.documentuploadservice.global.exception.CustomException;
 import java.time.ZoneId;
+
+import com.be.documentuploadservice.repository.FileElasticSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,10 +23,15 @@ public class DocumentEventProducer {
 
   // Producer 역할을 간단하게 해주는 템플릿 객체
   private final KafkaTemplate<String, DocumentUploadedEvent> kafkaTemplate;
+  private final FileElasticSearchRepository fileElasticSearchRepository;
 
-  public void publishDocumentEvent(UploadedFile fileEntity, String s3Key, String traceId, String mimeType) {
+  public void publishDocumentEvent(Long fileId, String s3Key, String traceId, String mimeType) {
 
     try {
+
+        UploadedFile fileEntity = fileElasticSearchRepository.findById(fileId)
+                .orElseThrow(() -> new CustomException(S3ErrorCode.FILE_NOT_FOUND));
+
       // Meta 객체 생성
       Meta meta = Meta.newBuilder()
           .setMimeType(mimeType != null ? mimeType : "application/pdf")
@@ -61,7 +69,7 @@ public class DocumentEventProducer {
           });
 
     } catch (Exception e) {
-      log.error("Kafka 이벤트 발행 중 오류 발생: traceId={}, fileId={}", traceId, fileEntity.getFileId(), e);
+      log.error("Kafka 이벤트 발행 중 오류 발생: traceId={}", traceId, e);
       throw new CustomException(KafkaErrorCode.MESSAGE_PUBLISH_FAILED);
     }
   }

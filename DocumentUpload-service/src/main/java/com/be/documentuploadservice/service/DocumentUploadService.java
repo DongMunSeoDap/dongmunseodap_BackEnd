@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.be.documentuploadservice.repository.FileElasticSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +31,7 @@ public class DocumentUploadService {
 
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
-  // private final FileElasticSearchRepository fileElasticSearchRepository;
-  private final DocumentEventProducer documentEventProducer;
+  private final FileElasticSearchRepository fileElasticSearchRepository;
 
   // 문서 업로드(s3 저장 + es 저장)
   @Transactional
@@ -45,7 +46,7 @@ public class DocumentUploadService {
       log.info("S3 업로드 완료: {}", s3Key);
 
       // Elasticsearch에 메타데이터 저장
-      UploadedFile fileEntity = UploadedFile.builder()
+      UploadedFile uploadedFile = UploadedFile.builder()
           .fileName(file.getOriginalFilename())
           .s3Key(s3Key)
           .uploadedBy("admin")
@@ -54,16 +55,8 @@ public class DocumentUploadService {
           .message("파일 업로드 성공")
           .build();
 
-      /*UploadedFile savedEntity = fileElasticSearchRepository.save(fileEntity);
-      log.info("Elasticsearch 저장 완료: fileId={}", savedEntity.getFileId());*/
-
-      // Kafka 이벤트 발행
-      documentEventProducer.publishDocumentEvent(
-          fileEntity, // 추후에 es에 저장된 엔티티로 변경
-          s3Key,
-          traceId,
-          file.getContentType()
-      );
+      UploadedFile savedEntity = fileElasticSearchRepository.save(uploadedFile);
+      log.info("Elasticsearch 저장 완료: fileId={}", savedEntity.getFileId());
 
       return UploadResponse.builder()
           .traceId(traceId)
