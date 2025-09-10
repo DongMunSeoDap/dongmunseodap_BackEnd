@@ -35,7 +35,7 @@ public class DocumentUploadController {
 
     // kafka event 발행
     documentEventProducer.publishDocumentEvent(
-        uploadResponse.getFileId(), // 추후에 es에 저장된 엔티티로 변경
+        uploadResponse.getFileId(),
         uploadResponse.getS3Key(),
         uploadResponse.getTraceId(),
         file.getContentType()

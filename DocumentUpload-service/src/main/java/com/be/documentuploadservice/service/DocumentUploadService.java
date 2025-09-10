@@ -47,6 +47,7 @@ public class DocumentUploadService {
 
       // Elasticsearch에 메타데이터 저장
       UploadedFile uploadedFile = UploadedFile.builder()
+          .fileId(UUID.randomUUID().toString())
           .fileName(file.getOriginalFilename())
           .s3Key(s3Key)
           .uploadedBy("admin")
@@ -59,6 +60,7 @@ public class DocumentUploadService {
       log.info("Elasticsearch 저장 완료: fileId={}", savedEntity.getFileId());
 
       return UploadResponse.builder()
+          .fileId(savedEntity.getFileId())
           .traceId(traceId)
           .s3Key(s3Key)
           .build();

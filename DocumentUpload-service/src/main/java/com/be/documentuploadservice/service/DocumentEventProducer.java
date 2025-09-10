@@ -29,8 +29,16 @@ public class DocumentEventProducer {
 
     try {
 
-        UploadedFile fileEntity = fileElasticSearchRepository.findById(fileId)
-                .orElseThrow(() -> new CustomException(S3ErrorCode.FILE_NOT_FOUND));
+      // fileId null 체크 추가
+      if (fileId == null || fileId.trim().isEmpty()) {
+        log.error("fileId가 null이거나 비어있습니다: fileId={}, traceId={}", fileId, traceId);
+        throw new CustomException(S3ErrorCode.FILE_NOT_FOUND);
+      }
+
+      log.info("ES 조회 시작: fileId={}, traceId={}", fileId, traceId);
+
+      UploadedFile fileEntity = fileElasticSearchRepository.findById(fileId)
+          .orElseThrow(() -> new CustomException(S3ErrorCode.FILE_NOT_FOUND));
 
       // Meta 객체 생성
       Meta meta = Meta.newBuilder()
