@@ -25,7 +25,7 @@ public class DocumentEventProducer {
   private final KafkaTemplate<String, DocumentUploadedEvent> kafkaTemplate;
   private final FileElasticSearchRepository fileElasticSearchRepository;
 
-  public void publishDocumentEvent(Long fileId, String s3Key, String traceId, String mimeType) {
+  public void publishDocumentEvent(String fileId, String s3Key, String traceId, String mimeType) {
 
     try {
 

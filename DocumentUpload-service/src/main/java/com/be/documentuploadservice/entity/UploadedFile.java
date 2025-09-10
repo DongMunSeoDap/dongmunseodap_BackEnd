@@ -23,8 +23,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 public class UploadedFile { // es 저장
 
   @Id
-  @Field(type = FieldType.Long)
-  private Long fileId; // 문서 고유 ID
+  @Field(type = FieldType.Keyword)
+  private String fileId; // 문서 고유 ID
 
   // 파일 업로드 관련 정보
   @Field(type = FieldType.Text)

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 public class UploadResponse {
 
-  private Long fileId;
+  private String fileId;
 
   private String traceId; // 카프카 메세지 추적용 id
 
