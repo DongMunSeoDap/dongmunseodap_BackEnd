@@ -46,7 +46,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // kafka
-    implementation 'org.springframework.cloud:spring-cloud-starter-bus-kafka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-bus-kafka
     
     // graphql
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
@@ -72,10 +72,8 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 
-    // avro - Swagger 의존성 제외
-    implementation("io.confluent:kafka-avro-serializer:7.5.0") {
-        exclude group: "io.swagger.core.v3", module: "swagger-annotations"
-    }
+    // avro
+    implementation "io.confluent:kafka-avro-serializer:7.5.0"
 
 }
 

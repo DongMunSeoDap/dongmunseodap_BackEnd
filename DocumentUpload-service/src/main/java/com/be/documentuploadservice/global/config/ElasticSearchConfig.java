@@ -11,20 +11,20 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories // Elasticsearch Repository 활성화를 위한 어노테이션
 public class ElasticSearchConfig extends ElasticsearchConfiguration {
 
-  /*@Value("${spring.elasticsearch.username}")
+  @Value("${spring.elasticsearch.username}")
   private String username;
 
   @Value("${spring.elasticsearch.password}")
-  private String password;*/
+  private String password;
 
-  /*@Value("${spring.elasticsearch.uris}")
-  private String esHost;*/
+  @Value("${spring.elasticsearch.uris}")
+  private String[] esHost;
 
   @Override
   public ClientConfiguration clientConfiguration() {
     return ClientConfiguration.builder()
-        .connectedTo("localhost:9200")
-        // .withBasicAuth(username, password)
+        .connectedTo(esHost)
+        .withBasicAuth(username, password)
         .build();
   }
 }
