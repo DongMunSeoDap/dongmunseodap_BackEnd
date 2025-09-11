@@ -3,6 +3,7 @@
 - `main`: 배포 가능한 브랜치, 항상 배포 가능한 상태를 유지
 - `feature/{description}`: 새로운 기능을 개발하는 브랜치
     - 예: `feature/social-login`
+- 브랜치 공유 X
 
 **Flow**
 
