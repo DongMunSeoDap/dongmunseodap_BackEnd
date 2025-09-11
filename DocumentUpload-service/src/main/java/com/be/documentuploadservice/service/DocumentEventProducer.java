@@ -26,7 +26,6 @@ public class DocumentEventProducer {
   // Producer 역할을 간단하게 해주는 템플릿 객체
   // private final KafkaTemplate<String, DocumentUploadedEvent> kafkaTemplate;
   private final KafkaTemplate<String, Object> kafkaTemplate;
-  private final FileElasticSearchRepository fileElasticSearchRepository;
 
   public void publishDocumentEvent(UploadedFile uploadedFile, String s3Key, String traceId, String mimeType) {
 
