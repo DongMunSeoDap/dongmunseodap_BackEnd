@@ -1,5 +1,4 @@
 HELP.md
-.gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -32,6 +31,7 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
+.gradle/
 
 ### VS Code ###
 .vscode/

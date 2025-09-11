@@ -12,7 +12,7 @@
         "type": "record",
         "name": "Payload",
         "fields": [
-          { "name": "document_id", "type": "long" },
+          { "name": "document_id", "type": "string" },
           { "name": "file_name", "type": "string" },
           { "name": "s3_path", "type": "string" },
           { "name": "uploaded_by", "type": "string" },

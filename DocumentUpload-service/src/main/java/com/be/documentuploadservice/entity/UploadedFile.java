@@ -2,6 +2,8 @@ package com.be.documentuploadservice.entity;
 
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import lombok.AllArgsConstructor;
@@ -23,8 +25,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 public class UploadedFile { // es 저장
 
   @Id
-  @Field(type = FieldType.Long)
-  private Long fileId; // 문서 고유 ID
+  @Field(type = FieldType.Keyword)
+  private String fileId; // 문서 고유 ID
 
   // 파일 업로드 관련 정보
   @Field(type = FieldType.Text)
@@ -34,9 +36,13 @@ public class UploadedFile { // es 저장
   private String s3Key; // S3 객체 키
 
   @Field(type = FieldType.Text)
+  private String traceId; // kafka 메세지 추적용 id
+
+  @Field(type = FieldType.Text)
   private String uploadedBy; // 업로드 한 사람(추후에 user와 매핑)
 
-  @Field(type = FieldType.Date)
+  @Field(type = FieldType.Date, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSS||uuuu-MM-dd||epoch_millis")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
   private LocalDateTime uploadedAt; // 절대 시점
 
   // 업로드 상태

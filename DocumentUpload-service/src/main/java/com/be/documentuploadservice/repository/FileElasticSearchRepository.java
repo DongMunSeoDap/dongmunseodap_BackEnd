@@ -1,4 +1,3 @@
-/*
 package com.be.documentuploadservice.repository;
 
 import com.be.documentuploadservice.entity.UploadedFile;
@@ -11,4 +10,3 @@ public interface FileElasticSearchRepository extends ElasticsearchRepository<Upl
 
 }
 
-*/
