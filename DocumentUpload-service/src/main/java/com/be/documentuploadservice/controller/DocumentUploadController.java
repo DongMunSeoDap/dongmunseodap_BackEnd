@@ -33,14 +33,6 @@ public class DocumentUploadController {
 
     UploadResponse uploadResponse = documentUploadService.uploadDocuments(pathName, file);
 
-    // kafka event 발행
-    documentEventProducer.publishDocumentEvent(
-        uploadResponse.getFileId(),
-        uploadResponse.getS3Key(),
-        uploadResponse.getTraceId(),
-        file.getContentType()
-    );
-
     return ResponseEntity.ok(BaseResponse.success("문서 업로드에 성공했습니다.", uploadResponse));
   }
 

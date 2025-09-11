@@ -32,6 +32,7 @@ public class DocumentUploadService {
   private final AmazonS3 amazonS3; // AWS SDK에서 제공하는 S3 클라이언트 객체
   private final S3Config s3Config; // 버킷 이름과 경로 등 설정 정보
   private final FileElasticSearchRepository fileElasticSearchRepository;
+  private final DocumentEventProducer documentEventProducer;
 
   // 문서 업로드(s3 저장 + es 저장)
   @Transactional
@@ -45,19 +46,24 @@ public class DocumentUploadService {
       uploadFile(pathName, file);
       log.info("S3 업로드 완료: {}", s3Key);
 
-      // Elasticsearch에 메타데이터 저장
+      // 메타데이터 생성
       UploadedFile uploadedFile = UploadedFile.builder()
           .fileId(UUID.randomUUID().toString())
           .fileName(file.getOriginalFilename())
           .s3Key(s3Key)
+          .traceId(traceId)
           .uploadedBy("admin")
           .uploadedAt(LocalDateTime.now())
           .status(UploadStatus.SUCCESS)
           .message("파일 업로드 성공")
           .build();
 
+      // ES에 저장
       UploadedFile savedEntity = fileElasticSearchRepository.save(uploadedFile);
       log.info("Elasticsearch 저장 완료: fileId={}", savedEntity.getFileId());
+
+      // 이벤트 발행
+      documentEventProducer.publishDocumentEvent(uploadedFile, uploadedFile.getS3Key(), uploadedFile.getTraceId(),"application/pdf");
 
       return UploadResponse.builder()
           .fileId(savedEntity.getFileId())

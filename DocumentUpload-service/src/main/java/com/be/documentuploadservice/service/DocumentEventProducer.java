@@ -25,21 +25,9 @@ public class DocumentEventProducer {
   private final KafkaTemplate<String, DocumentUploadedEvent> kafkaTemplate;
   private final FileElasticSearchRepository fileElasticSearchRepository;
 
-  public void publishDocumentEvent(String fileId, String s3Key, String traceId, String mimeType) {
+  public void publishDocumentEvent(UploadedFile uploadedFile, String s3Key, String traceId, String mimeType) {
 
     try {
-
-      // fileId null 체크 추가
-      if (fileId == null || fileId.trim().isEmpty()) {
-        log.error("fileId가 null이거나 비어있습니다: fileId={}, traceId={}", fileId, traceId);
-        throw new CustomException(S3ErrorCode.FILE_NOT_FOUND);
-      }
-
-      log.info("ES 조회 시작: fileId={}, traceId={}", fileId, traceId);
-
-      UploadedFile fileEntity = fileElasticSearchRepository.findById(fileId)
-          .orElseThrow(() -> new CustomException(S3ErrorCode.FILE_NOT_FOUND));
-
       // Meta 객체 생성
       Meta meta = Meta.newBuilder()
           .setMimeType(mimeType != null ? mimeType : "application/pdf")
@@ -48,11 +36,11 @@ public class DocumentEventProducer {
 
       // Payload 객체 생성
       Payload payload = Payload.newBuilder()
-          .setDocumentId(fileEntity.getFileId()) // ES에 저장된 파일 ID 사용
-          .setFileName(fileEntity.getFileName()) // 원본 파일 이름이 정의되어 있음
+          .setDocumentId(uploadedFile.getFileId()) // ES에 저장된 파일 ID 사용
+          .setFileName(uploadedFile.getFileName()) // 원본 파일 이름이 정의되어 있음
           .setS3Path(s3Key) // s3Key
-          .setUploadedBy(fileEntity.getUploadedBy()) // 추후 사용자 이름으로 변경(현재 "admin"으로 고정됨)
-          .setUploadedAt(fileEntity.getUploadedAt()
+          .setUploadedBy(uploadedFile.getUploadedBy()) // 추후 사용자 이름으로 변경(현재 "admin"으로 고정됨)
+          .setUploadedAt(uploadedFile.getUploadedAt()
               .atZone(ZoneId.of("Asia/Seoul"))
               .toInstant())
           .build();
@@ -70,9 +58,9 @@ public class DocumentEventProducer {
       kafkaTemplate.send("document-uploaded", traceId, event)
           .whenComplete((result, ex) -> {
             if (ex == null) {
-              log.info("이벤트 발행 성공: traceId={}, fileId={}", traceId, fileEntity.getFileId());
+              log.info("이벤트 발행 성공: traceId={}, fileId={}", traceId, uploadedFile.getFileId());
             } else {
-              log.error("이벤트 발행 실패: traceId={}, fileId={}", traceId, fileEntity.getFileId(), ex);
+              log.error("이벤트 발행 실패: traceId={}, fileId={}", traceId, uploadedFile.getFileId(), ex);
             }
           });
 
