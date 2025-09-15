@@ -3,10 +3,13 @@ package com.be.documentsearchservice.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
 @AllArgsConstructor
+@Data
 public class ReferencedChunkDto {
-    private String text;
-    private double chunkIndex;
-    private String source; // optional
+    private String id;
+    private String document_content;
+    private Double distance;
+    private Double chunkIndex;
+    private Double score; // optional
+
 }

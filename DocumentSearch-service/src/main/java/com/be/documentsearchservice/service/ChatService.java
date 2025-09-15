@@ -17,6 +17,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,26 +43,51 @@ public class ChatService {
 
         // 1. 벡터 스토어와 임베딩 생성
         VectorStore vectorStore = vectorStoreConfig.pineconeVectorStore(embeddingModel);
-        List<Document> docs = vectorStore.similaritySearch(SearchRequest.builder().query(query).build());
+        List<Document> docs = vectorStore.similaritySearch(SearchRequest.builder().query(query).topK(5).build());
 
         List<ReferencedChunkDto> chunks = docs.stream()
-                .map(doc -> new ReferencedChunkDto(
-                        doc.getText(),
-                        (double) doc.getMetadata().get("chunk_index"),  // 중요!
-                        (String) doc.getMetadata().getOrDefault("source", "unknown")
-                ))
+                .map(doc -> {
+                    Map<String, Object> meta = doc.getMetadata();
+
+                    double distance = toDouble(firstNonNull(meta.get("distance"), meta.get("DISTANCE")), 0.0);
+
+                    return new ReferencedChunkDto(
+                            doc.getId(),
+                            doc.getText(),
+                            distance,
+                            (Double)doc.getMetadata().get("chunk_index"),
+                            doc.getScore()
+                    );
+                })
                 .collect(Collectors.toList());
 
-        String chunkContext = chunks.stream()
-                .map(chunk -> "- " + chunk.getText())
+        String chunkID = chunks.stream()
+                .map(chunk -> "Id: " + chunk.getId())
                 .collect(Collectors.joining("\n"));
 
         String chunkContent = chunks.stream()
-                .map(chunk -> "[index: " + chunk.getChunkIndex()+"]")
+                .map(chunk -> "document_content: " + chunk.getDocument_content())
                 .collect(Collectors.joining("\n"));
 
-        log.info("chunkContext: " + chunkContext);
-        log.info("chunkContent:\n{}", chunkContent);
+        String chunkDistance = chunks.stream()
+                .map(chunk -> "Distance: " + chunk.getDistance())
+                .collect(Collectors.joining("\n"));
+
+
+        String chunkIndex = chunks.stream()
+                .map(chunk -> "Index: " + chunk.getChunkIndex())
+                .collect(Collectors.joining("\n"));
+
+        String chunkScore = chunks.stream()
+                .map(chunk -> "Score: " + chunk.getScore())
+                .collect(Collectors.joining("\n"));
+
+        //log.info(docs.toString());
+        log.info(chunkID);
+        log.info(chunkContent);
+        log.info(chunkDistance);
+        log.info(chunkIndex);
+        log.info(chunkScore);
 
         // 3. GPT 응답 생성
         ChatClient chatClient = ChatClient.builder(chatModel)
@@ -72,7 +98,7 @@ public class ChatService {
                 .build();
 
         ChatResponse chatResponse = chatClient.prompt()
-                .system("Please provide the response in Korean, using plain text without Markdown. Structure the response in readable paragraphs. Use only the provided reference documents below as the source of information when answering.\n" + chunkContext)
+                .system("Please provide the response in Korean, using plain text without Markdown. Structure the response in readable paragraphs. Use only the provided reference documents below as the source of information when answering.\n" + chunkContent)
                 .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .user(query)
                 .call()
@@ -88,6 +114,20 @@ public class ChatService {
 
         return chatResponseDto;
     }
+
+    private static Object firstNonNull(Object a, Object b) {
+        return (a != null) ? a : b;
+    }
+
+    private static double toDouble(Object v, double def) {
+        if (v == null) return def;
+        if (v instanceof Number n) return n.doubleValue(); // Float/Integer/Long/Double 모두 OK
+        if (v instanceof String s) {
+            try { return Double.parseDouble(s); } catch (NumberFormatException ignored) {}
+        }
+        return def;
+    }
+
 
 
 }
