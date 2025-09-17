@@ -56,7 +56,8 @@ public class ChatService {
                             doc.getText(),
                             distance,
                             (Double)doc.getMetadata().get("chunk_index"),
-                            doc.getScore()
+                            doc.getScore(),
+                            doc.getMetadata()
                     );
                 })
                 .collect(Collectors.toList());
@@ -82,12 +83,18 @@ public class ChatService {
                 .map(chunk -> "Score: " + chunk.getScore())
                 .collect(Collectors.joining("\n"));
 
+        String chunkMetadata = chunks.stream()
+                .map(chunk -> "Metadata: " + chunk.getMetadata())
+                .collect(Collectors.joining("\n"))
+                .toString();
+
         //log.info(docs.toString());
         log.info(chunkID);
         log.info(chunkContent);
         log.info(chunkDistance);
         log.info(chunkIndex);
         log.info(chunkScore);
+        log.info(chunkMetadata);
 
         // 3. GPT 응답 생성
         ChatClient chatClient = ChatClient.builder(chatModel)
@@ -98,7 +105,7 @@ public class ChatService {
                 .build();
 
         ChatResponse chatResponse = chatClient.prompt()
-                .system("Please provide the response in Korean, using plain text without Markdown. Structure the response in readable paragraphs. Use only the provided reference documents below as the source of information when answering.\n" + chunkContent)
+                .system("Your role is to provide answers based on the user manual. Provide the response in Korean, using plain text without Markdown. Structure the response in readable paragraphs. You must write in a way that is specific and easy for the user to follow. From the end of this sentence onward, prioritize the following user manual's text when providing information, and make sure to read it until the end before providing your answer.\n" + chunkContent)
                 .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .user(query)
                 .call()

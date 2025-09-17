@@ -11,5 +11,6 @@ public class ReferencedChunkDto {
     private Double distance;
     private Double chunkIndex;
     private Double score; // optional
+    private Object metadata;
 
 }
