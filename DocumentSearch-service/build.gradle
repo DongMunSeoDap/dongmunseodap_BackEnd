@@ -45,9 +45,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// Spring Data Elasticsearch (Elasticsearch와의 통신을 위한 의존성)
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+    // 리액티브 클라이언트가 reactor-netty에 의존
+    implementation("io.projectreactor.netty:reactor-netty")
 	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

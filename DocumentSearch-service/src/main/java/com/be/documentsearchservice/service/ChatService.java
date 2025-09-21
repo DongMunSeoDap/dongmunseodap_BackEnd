@@ -3,7 +3,8 @@ package com.be.documentsearchservice.service;
 import com.be.documentsearchservice.config.VectorStoreConfig;
 import com.be.documentsearchservice.dto.ChatResponseDto;
 import com.be.documentsearchservice.dto.QueryRequest;
-import com.be.documentsearchservice.dto.ReferencedChunkDto;
+import com.be.documentsearchservice.entity.RagChunkEntity;
+import com.be.documentsearchservice.repository.RagChunkRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,12 +30,15 @@ public class ChatService {
     private final ChatMemory chatMemory;
     private final EmbeddingModel embeddingModel;
     private VectorStoreConfig vectorStoreConfig;
+    private final RagChunkRepository ragChunkRepository;
 
-    public ChatService(ChatModel chatModel, ChatMemory chatMemory, EmbeddingModel embeddingModel, VectorStoreConfig vectorStoreConfig) {
+
+    public ChatService(ChatModel chatModel, ChatMemory chatMemory, EmbeddingModel embeddingModel, VectorStoreConfig vectorStoreConfig, RagChunkRepository ragChunkRepository) {
         this.chatModel = chatModel;
         this.chatMemory = chatMemory;
         this.embeddingModel = embeddingModel;
         this.vectorStoreConfig = vectorStoreConfig;
+        this.ragChunkRepository = ragChunkRepository;
     }
 
     public ChatResponseDto search_ongoing(QueryRequest queryRequest) {
@@ -45,56 +50,34 @@ public class ChatService {
         VectorStore vectorStore = vectorStoreConfig.pineconeVectorStore(embeddingModel);
         List<Document> docs = vectorStore.similaritySearch(SearchRequest.builder().query(query).topK(5).build());
 
-        List<ReferencedChunkDto> chunks = docs.stream()
+        List<RagChunkEntity> entities = docs.stream()
                 .map(doc -> {
-                    Map<String, Object> meta = doc.getMetadata();
-
-                    double distance = toDouble(firstNonNull(meta.get("distance"), meta.get("DISTANCE")), 0.0);
-
-                    return new ReferencedChunkDto(
-                            doc.getId(),
-                            doc.getText(),
-                            distance,
-                            (Double)doc.getMetadata().get("chunk_index"),
-                            doc.getScore(),
-                            doc.getMetadata()
-                    );
+                    Map<String, Object> md = doc.getMetadata();
+                    return RagChunkEntity.builder()
+                            .id(doc.getId())
+                            .content((String) md.get("document_content"))
+                            .distance(asDouble(md.get("distance")))
+                            .score(asDouble(md.get("score")))
+                            .chunkIndex(asDouble(md.get("chunk_index")))
+                            // savedAt은 @CreatedDate에 의해 자동 세팅됨
+                            .build();
                 })
                 .collect(Collectors.toList());
 
-        String chunkID = chunks.stream()
-                .map(chunk -> "Id: " + chunk.getId())
-                .collect(Collectors.joining("\n"));
+        // 3. ES에 저장
+        ragChunkRepository.saveAll(entities)
+                .doOnNext(e -> log.info("Saved: {}", e.getId()))
+                .doOnError(err -> log.error("ES save error", err))
+                .subscribe();
 
-        String chunkContent = chunks.stream()
-                .map(chunk -> "document_content: " + chunk.getDocument_content())
-                .collect(Collectors.joining("\n"));
+        // 4. 프롬프트 컨텍스트 생성
+        String chunkContent = entities.stream()
+                .map(RagChunkEntity::getContent)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.joining("\n---\n"));
 
-        String chunkDistance = chunks.stream()
-                .map(chunk -> "Distance: " + chunk.getDistance())
-                .collect(Collectors.joining("\n"));
-
-
-        String chunkIndex = chunks.stream()
-                .map(chunk -> "Index: " + chunk.getChunkIndex())
-                .collect(Collectors.joining("\n"));
-
-        String chunkScore = chunks.stream()
-                .map(chunk -> "Score: " + chunk.getScore())
-                .collect(Collectors.joining("\n"));
-
-        String chunkMetadata = chunks.stream()
-                .map(chunk -> "Metadata: " + chunk.getMetadata())
-                .collect(Collectors.joining("\n"))
-                .toString();
-
-        //log.info(docs.toString());
-        log.info(chunkID);
-        log.info(chunkContent);
-        log.info(chunkDistance);
-        log.info(chunkIndex);
-        log.info(chunkScore);
-        log.info(chunkMetadata);
 
         // 3. GPT 응답 생성
         ChatClient chatClient = ChatClient.builder(chatModel)
@@ -105,7 +88,17 @@ public class ChatService {
                 .build();
 
         ChatResponse chatResponse = chatClient.prompt()
-                .system("Your role is to provide answers based on the user manual. Provide the response in Korean, using plain text without Markdown. Structure the response in readable paragraphs. You must write in a way that is specific and easy for the user to follow. From the end of this sentence onward, prioritize the following user manual's text when providing information, and make sure to read it until the end before providing your answer.\n" + chunkContent)
+                .system("""
+                    Your role is to provide answers based on the user manual. 
+                    Provide the response in Korean, using plain text without Markdown. 
+                    Structure the response in readable paragraphs. 
+                    You must write in a way that is specific and easy for the user to follow. 
+                    From the end of this sentence onward, prioritize the following user manual's text when providing information, 
+                    and make sure to read it until the end before providing your answer.
+
+                    [근거 문장들]
+                    %s
+                    """.formatted(chunkContent))
                 .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .user(query)
                 .call()
@@ -122,19 +115,11 @@ public class ChatService {
         return chatResponseDto;
     }
 
-    private static Object firstNonNull(Object a, Object b) {
-        return (a != null) ? a : b;
+    private Double asDouble(Object v) {
+        if (v instanceof Number n) return n.doubleValue();
+        if (v instanceof String s) try { return Double.parseDouble(s); } catch (Exception ignored) {}
+        return null;
     }
-
-    private static double toDouble(Object v, double def) {
-        if (v == null) return def;
-        if (v instanceof Number n) return n.doubleValue(); // Float/Integer/Long/Double 모두 OK
-        if (v instanceof String s) {
-            try { return Double.parseDouble(s); } catch (NumberFormatException ignored) {}
-        }
-        return def;
-    }
-
 
 
 }
