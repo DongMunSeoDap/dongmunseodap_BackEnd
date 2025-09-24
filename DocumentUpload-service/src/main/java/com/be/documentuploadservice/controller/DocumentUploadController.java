@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/upload")
+@RequestMapping("/api")
 public class DocumentUploadController {
 
   private final DocumentUploadService documentUploadService;
