@@ -14,9 +14,8 @@ import java.time.Instant;
 @NoArgsConstructor @AllArgsConstructor
 @Document(indexName = "rag-chunks")
 public class RagChunkEntity {
-
     @Id
-    private String id;                       // Pinecone id (가능하면 그대로)
+    private String vectorDBId;                       // Pinecone id (가능하면 그대로)
 
     @Field(type = FieldType.Text, analyzer = "standard")
     private String content;                  // chunk 텍스트
@@ -29,6 +28,9 @@ public class RagChunkEntity {
 
     @Field(type = FieldType.Double)
     private Double chunkIndex;              // metadata.chunk_index
+
+    @Field(type = FieldType.Keyword)
+    private String embeddingVersion;
 
     // ✅ 생성 시간 자동 세팅
     @CreatedDate

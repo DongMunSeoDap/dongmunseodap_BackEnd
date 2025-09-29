@@ -3,7 +3,9 @@ package com.be.documentsearchservice.service;
 import com.be.documentsearchservice.config.VectorStoreConfig;
 import com.be.documentsearchservice.dto.ChatResponseDto;
 import com.be.documentsearchservice.dto.QueryRequest;
+import com.be.documentsearchservice.dto.RagChunkDto;
 import com.be.documentsearchservice.entity.RagChunkEntity;
+import com.be.documentsearchservice.mapper.RagChunkMapper;
 import com.be.documentsearchservice.repository.RagChunkRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -16,6 +18,8 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,22 @@ public class ChatService {
         this.ragChunkRepository = ragChunkRepository;
     }
 
+    public Mono<RagChunkDto> saveChunk(RagChunkDto dto) {
+        RagChunkEntity entity = RagChunkMapper.toEntity(dto);
+        return ragChunkRepository.save(entity)
+                .map(RagChunkMapper::toDto);
+    }
+
+    public Flux<RagChunkDto> findAllChunks() {
+        return ragChunkRepository.findAll()
+                .map(RagChunkMapper::toDto);
+    }
+
+    public Mono<RagChunkDto> findById(String id) {
+        return ragChunkRepository.findById(id)
+                .map(RagChunkMapper::toDto);
+    }
+
     public ChatResponseDto search_ongoing(QueryRequest queryRequest) {
         String query = queryRequest.getContent();
         long userId = queryRequest.getUserId();
@@ -54,7 +74,7 @@ public class ChatService {
                 .map(doc -> {
                     Map<String, Object> md = doc.getMetadata();
                     return RagChunkEntity.builder()
-                            .id(doc.getId())
+                            .vectorDBId(doc.getId())
                             .content((String) md.get("document_content"))
                             .distance(asDouble(md.get("distance")))
                             .score(asDouble(md.get("score")))
@@ -66,7 +86,7 @@ public class ChatService {
 
         // 3. ES에 저장
         ragChunkRepository.saveAll(entities)
-                .doOnNext(e -> log.info("Saved: {}", e.getId()))
+                .doOnNext(e -> log.info("Saved: {}", e.getVectorDBId()))
                 .doOnError(err -> log.error("ES save error", err))
                 .subscribe();
 
