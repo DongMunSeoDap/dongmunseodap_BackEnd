@@ -1,0 +1,18 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      # HTTP TLS는 기본 활성 (ES 8 기본값). 로컬에선 비활성화보다 기본 인증+자체 인증서 사용이 간단.
+      - ELASTIC_PASSWORD=a4Xqk0ehqWPloLpRbrIa  # ★ 개발용 비번
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -u elastic:a4Xqk0ehqWPloLpRbrIa https://localhost:9200 | grep -q 'cluster_name'"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
