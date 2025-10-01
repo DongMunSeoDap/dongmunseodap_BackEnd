@@ -9,5 +9,5 @@ public class ChatResponseDto {
     private long userId;
     private String query;
     private String answer;
-    private Object metadata;
+    private ChatResponseMetadataDto metadata;
 }

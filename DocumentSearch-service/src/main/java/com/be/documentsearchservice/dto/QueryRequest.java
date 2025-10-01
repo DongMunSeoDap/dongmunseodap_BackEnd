@@ -6,7 +6,7 @@ public class QueryRequest {
     private long userId;
     private String content;
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
