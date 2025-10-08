@@ -19,7 +19,8 @@
           { "name": "uploaded_at",
 		        "type": {
                   "type": "long",
-                  "logicalType": "timestamp-millis"},
+                  "logicalType": "timestamp-millis"
+                },
             "doc": "ISO 8601 timestamp" }
         ]
       }
