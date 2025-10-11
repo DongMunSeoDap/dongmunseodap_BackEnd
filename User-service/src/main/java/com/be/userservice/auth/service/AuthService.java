@@ -91,7 +91,6 @@ public class AuthService {
             User newUser = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(rawPassword))
-                .nickName(nickname)
                 .role(role)
                 .build();
 

@@ -28,7 +28,4 @@ public class SignUpRequest {
   @Schema(description = "비밀번호", example = "1234")
   private String password;
 
-  @Schema(description = "사용자 닉네임", example = "???")
-  private String nickName;
-
 }
